@@ -13,9 +13,9 @@ import (
 	"github.com/toqueteos/webbrowser"
 )
 
-var mainAPIUrl string = "https://api.500px.com/v1/oauth/"
+var mainAPIUrl = "https://api.500px.com/v1/oauth/"
 
-type OAuthInfo struct {
+type oAuthInfo struct {
 	consumerKey    string
 	consumerSecret string
 	OAuthToken     string
@@ -29,7 +29,7 @@ type authResp struct {
 	verifier string
 }
 
-func (oa *OAuthInfo) Auth() {
+func (oa *oAuthInfo) Auth() {
 	_, u, err := oa.c.GetRequestTokenAndUrl(fmt.Sprint("http://127.0.0.1:", oa.Port))
 	if err != nil {
 		log.Panicln(err)
@@ -42,11 +42,14 @@ func (oa *OAuthInfo) Auth() {
 	c := make(chan authResp)
 	go serveOAuthResp(l, &c)
 
-	webbrowser.Open(u)
+	err = webbrowser.Open(u)
+	if err != nil {
+		log.Panicln(err)
+	}
 
 	auth := <-c
 
-	l.Close()
+	_ = l.Close()
 
 	oa.OAuthToken = auth.token
 	oa.OAuthVerifier = auth.verifier
@@ -58,15 +61,15 @@ func serveOAuthResp(l net.Listener, stop *chan authResp) {
 			stop,
 		},
 	}
-	s.Serve(l)
+	_ = s.Serve(l)
 }
 
 type myHandler struct {
 	a *chan authResp
 }
 
-func newOAuth(consumerKey, consumerSecret string) OAuthInfo {
-	return OAuthInfo{
+func newOAuth(consumerKey, consumerSecret string) oAuthInfo {
+	return oAuthInfo{
 		consumerKey:    consumerKey,
 		consumerSecret: consumerSecret,
 		c:              genOAuthConsumer(consumerKey, consumerSecret),

@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	oauthResponce         string = "/?oauth_token=0U3iDlwSGMRAx0XiejCNgCtMPVZ7yLVRr4XPHdYF&oauth_verifier=vNjuWrmN3mewcAnPIUAD"
-	oauthTokenExpected    string = "0U3iDlwSGMRAx0XiejCNgCtMPVZ7yLVRr4XPHdYF"
-	oauthVerifierExpected string = "vNjuWrmN3mewcAnPIUAD"
+	oauthResponce         = "/?oauth_token=0U3iDlwSGMRAx0XiejCNgCtMPVZ7yLVRr4XPHdYF&oauth_verifier=vNjuWrmN3mewcAnPIUAD"
+	oauthTokenExpected    = "0U3iDlwSGMRAx0XiejCNgCtMPVZ7yLVRr4XPHdYF"
+	oauthVerifierExpected = "vNjuWrmN3mewcAnPIUAD"
 )
 
 func TestOAuthResponseParsing(t *testing.T) {
