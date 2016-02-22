@@ -15,21 +15,27 @@ import (
 
 var mainAPIUrl = "https://api.500px.com/v1/oauth/"
 
-type oAuthInfo struct {
-	consumerKey    string
-	consumerSecret string
+// OAuthData stores OAuth related keys
+type OAuthData struct {
+	ConsumerKey    string
+	ConsumerSecret string
 	OAuthToken     string
 	OAuthVerifier  string
-	c              *oauth.Consumer
-	Port           int
+}
+
+type oAuth struct {
+	params OAuthData
+	c      *oauth.Consumer
+	Port   int
 }
 
 type authResp struct {
 	token    string
 	verifier string
+	err      error
 }
 
-func (oa *oAuthInfo) Auth() {
+func (oa *oAuth) Auth() error {
 	_, u, err := oa.c.GetRequestTokenAndUrl(fmt.Sprint("http://127.0.0.1:", oa.Port))
 	if err != nil {
 		log.Panicln(err)
@@ -51,8 +57,12 @@ func (oa *oAuthInfo) Auth() {
 
 	_ = l.Close()
 
-	oa.OAuthToken = auth.token
-	oa.OAuthVerifier = auth.verifier
+	if auth.err != nil {
+		return auth.err
+	}
+	oa.params.OAuthToken = auth.token
+	oa.params.OAuthVerifier = auth.verifier
+	return nil
 }
 
 func serveOAuthResp(l net.Listener, stop *chan authResp) {
@@ -68,12 +78,11 @@ type myHandler struct {
 	a *chan authResp
 }
 
-func newOAuth(consumerKey, consumerSecret string) oAuthInfo {
-	return oAuthInfo{
-		consumerKey:    consumerKey,
-		consumerSecret: consumerSecret,
-		c:              genOAuthConsumer(consumerKey, consumerSecret),
-		Port:           8088,
+func newOAuth(authParams OAuthData) oAuth {
+	return oAuth{
+		params: authParams,
+		c:      genOAuthConsumer(authParams.ConsumerKey, authParams.ConsumerSecret),
+		Port:   8088,
 	}
 }
 
@@ -105,9 +114,9 @@ func parseAccessToken(urlQuery string) (oauthToken string, oauthVerifier string,
 func (h *myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	oauthToken, oauthVerifier, err := parseAccessToken(r.URL.String())
 	if err != nil {
-		log.Panicln(err)
+		*h.a <- authResp{"", "", err}
 	}
 
 	fmt.Fprintln(w, "Authentication complete.")
-	*h.a <- authResp{oauthToken, oauthVerifier}
+	*h.a <- authResp{oauthToken, oauthVerifier, nil}
 }
