@@ -13,20 +13,13 @@ import (
 	"github.com/toqueteos/webbrowser"
 )
 
-var mainAPIUrl = "https://api.500px.com/v1/oauth/"
-
-// OAuthData stores OAuth related keys
-type OAuthData struct {
-	ConsumerKey    string
-	ConsumerSecret string
-	OAuthToken     string
-	OAuthVerifier  string
-}
+// AccessToken is an alias for oauth.AccessToken structure
+type AccessToken oauth.AccessToken
 
 type oAuth struct {
-	params OAuthData
-	c      *oauth.Consumer
-	Port   int
+	c    *oauth.Consumer
+	t    *oauth.AccessToken
+	Port int
 }
 
 type authResp struct {
@@ -35,8 +28,8 @@ type authResp struct {
 	err      error
 }
 
-func (oa *oAuth) Auth() error {
-	_, u, err := oa.c.GetRequestTokenAndUrl(fmt.Sprint("http://127.0.0.1:", oa.Port))
+func (oa *oAuth) Auth() (*AccessToken, error) {
+	reqToken, u, err := oa.c.GetRequestTokenAndUrl(fmt.Sprint("http://127.0.0.1:", oa.Port))
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -58,11 +51,17 @@ func (oa *oAuth) Auth() error {
 	_ = l.Close()
 
 	if auth.err != nil {
-		return auth.err
+		return nil, auth.err
 	}
-	oa.params.OAuthToken = auth.token
-	oa.params.OAuthVerifier = auth.verifier
-	return nil
+	accessToken, err := oa.c.AuthorizeToken(reqToken, auth.verifier)
+
+	token := AccessToken(*accessToken)
+	return &token, nil
+}
+
+func (oa *oAuth) createClient(t *AccessToken) (*http.Client, error) {
+	at := oauth.AccessToken(*t)
+	return oa.c.MakeHttpClient(&at)
 }
 
 func serveOAuthResp(l net.Listener, stop *chan authResp) {
@@ -78,11 +77,10 @@ type myHandler struct {
 	a *chan authResp
 }
 
-func newOAuth(authParams OAuthData) oAuth {
+func newOAuth(key, secret string) oAuth {
 	return oAuth{
-		params: authParams,
-		c:      genOAuthConsumer(authParams.ConsumerKey, authParams.ConsumerSecret),
-		Port:   8088,
+		c:    genOAuthConsumer(key, secret),
+		Port: 8088,
 	}
 }
 
@@ -91,9 +89,9 @@ func genOAuthConsumer(consumerKey, consumerSecret string) *oauth.Consumer {
 		consumerKey,
 		consumerSecret,
 		oauth.ServiceProvider{
-			RequestTokenUrl:   mainAPIUrl + "request_token",
-			AuthorizeTokenUrl: mainAPIUrl + "authorize",
-			AccessTokenUrl:    mainAPIUrl + "access_token",
+			RequestTokenUrl:   mainAPIUrl + "oauth/request_token",
+			AuthorizeTokenUrl: mainAPIUrl + "oauth/authorize",
+			AccessTokenUrl:    mainAPIUrl + "oauth/access_token",
 		})
 }
 
