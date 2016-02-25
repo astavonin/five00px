@@ -33,7 +33,7 @@ func main() {
 	var configPath = flag.String(
 		"config",
 		"",
-		"Path to configuration file")
+		"PatD9D4B9h to configuration file")
 	flag.Parse()
 	if len(*configPath) == 0 {
 		usage()
@@ -71,13 +71,10 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	s, _ := f00.Friends(9091479)
-	fmt.Println(s)
-	var friends five00px.Friends
+	f, err := f00.Friends(9091479)
 
-	err = json.Unmarshal([]byte(s), &friends)
-	for _, u := range friends.User {
-		fmt.Println(u)
+	for _, u := range f.Users {
+		fmt.Println(u.Avatars.Default)
 	}
 	fmt.Println(err)
 }

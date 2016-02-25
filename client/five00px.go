@@ -2,6 +2,7 @@
 package five00px
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -44,30 +45,37 @@ func (f00 *Five00px) Restore(t *AccessToken) error {
 	return nil
 }
 
-func (f00 *Five00px) Users() (string, error) {
-	response, err := f00.c.Get(mainAPIUrl + "users")
+func doGet(c *http.Client, dstPoint string) ([]byte, error) {
+	response, err := c.Get(mainAPIUrl + dstPoint)
 	defer func() {
 		_ = response.Body.Close()
 	}()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	b, err := ioutil.ReadAll(response.Body)
-
-	return string(b), err
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
-func (f00 *Five00px) Friends(id int) (string, error) {
-	response, err := f00.c.Get(mainAPIUrl + "users/" + strconv.Itoa(id) + "/friends")
-	defer func() {
-		_ = response.Body.Close()
-	}()
-	if err != nil {
-		return "", err
-	}
+func (f00 *Five00px) User() (*User, error) {
+	b, err := doGet(f00.c, "users")
 
-	b, err := ioutil.ReadAll(response.Body)
+	var u User
+	err = json.Unmarshal(b, u)
 
-	return string(b), err
+	return &u, err
+}
+
+func (f00 *Five00px) Friends(id int) (*Friends, error) {
+	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/friends")
+
+	var friends Friends
+
+	err = json.Unmarshal(b, &friends)
+
+	return &friends, err
 }
