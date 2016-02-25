@@ -4,6 +4,7 @@ package five00px
 import (
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 // Five00px client
@@ -45,6 +46,20 @@ func (f00 *Five00px) Restore(t *AccessToken) error {
 
 func (f00 *Five00px) Users() (string, error) {
 	response, err := f00.c.Get(mainAPIUrl + "users")
+	defer func() {
+		_ = response.Body.Close()
+	}()
+	if err != nil {
+		return "", err
+	}
+
+	b, err := ioutil.ReadAll(response.Body)
+
+	return string(b), err
+}
+
+func (f00 *Five00px) Friends(id int) (string, error) {
+	response, err := f00.c.Get(mainAPIUrl + "users/" + strconv.Itoa(id) + "/friends")
 	defer func() {
 		_ = response.Body.Close()
 	}()
