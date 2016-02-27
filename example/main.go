@@ -71,10 +71,15 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	f, err := f00.Friends(9091479)
+	//f, err := f00.Friends(9091479)
 
-	for _, u := range f.Users {
-		fmt.Println(u.Avatars.Default)
+	//for _, u := range f.Users {
+	//fmt.Println(u.Avatars.Default)
+	//}
+	//u, err := f00.UserByID(99999999)
+	u, err := f00.UserByID(9091479)
+	if err != nil {
+		log.Fatal(err)
 	}
-	fmt.Println(err)
+	fmt.Println(u)
 }

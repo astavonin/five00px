@@ -3,8 +3,8 @@ package five00px
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -45,36 +45,58 @@ func (f00 *Five00px) Restore(t *AccessToken) error {
 	return nil
 }
 
-func doGet(c *http.Client, dstPoint string) ([]byte, error) {
-	response, err := c.Get(mainAPIUrl + dstPoint)
-	defer func() {
-		_ = response.Body.Close()
-	}()
+func userBy(c *http.Client, dstPoint string, vals *url.Values) (*User, error) {
+
+	b, err := doGet(c, dstPoint, vals)
+	if err != nil {
+		return nil, ErrUserNotFound
+	}
+
+	var objmap map[string]*json.RawMessage
+	err = json.Unmarshal(b, &objmap)
+
 	if err != nil {
 		return nil, err
 	}
-
-	b, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
-}
-
-func (f00 *Five00px) User() (*User, error) {
-	b, err := doGet(f00.c, "users")
 
 	var u User
-	err = json.Unmarshal(b, u)
+	err = json.Unmarshal(*objmap["user"], &u)
 
 	return &u, err
 }
 
+// UserByID call returns User struct for a user specified by id. If id == 0
+// returns the profile information for the current user.
+func (f00 *Five00px) UserByID(id int) (*User, error) {
+	var (
+		dstPoint = "users"
+		vals     *url.Values
+	)
+	if id != 0 {
+		dstPoint += "/show"
+		vals = &url.Values{"id": {strconv.Itoa(id)}}
+	}
+
+	return userBy(f00.c, dstPoint, vals)
+}
+
+// UserByName returns User struct for a user specified by name.
+func (f00 *Five00px) UserByName(name string) (*User, error) {
+
+	return userBy(f00.c, "users/show", &url.Values{"username": {name}})
+}
+
+// UserByEmail returns User struct for a user specified by email.
+func (f00 *Five00px) UserByEmail(email string) (*User, error) {
+
+	return userBy(f00.c, "users/show", &url.Values{"email": {email}})
+}
+
+// Friends call returns list of friends for a user specified by ID.
 func (f00 *Five00px) Friends(id int) (*Friends, error) {
-	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/friends")
+	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/friends", nil)
 
 	var friends Friends
-
 	err = json.Unmarshal(b, &friends)
 
 	return &friends, err

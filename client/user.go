@@ -1,6 +1,10 @@
 // Package five00px provides ...
 package five00px
 
+import "errors"
+
+// User 500px structure. See https://github.com/500px/api-documentation/blob/master/basics/formats_and_terms.md#full-format
+// for additional information.
 type User struct {
 	About                 string        `json:"about"`
 	Affection             int           `json:"affection"`
@@ -19,6 +23,7 @@ type User struct {
 	Equipment             Equipment     `json:"equipment"`
 	Firstname             string        `json:"firstname"`
 	FollowersCount        int           `json:"followers_count"`
+	Following             bool          `json:"following"`
 	FotomotoOn            bool          `json:"fotomoto_on"`
 	FriendsCount          int           `json:"friends_count"`
 	Fullname              string        `json:"fullname"`
@@ -47,17 +52,21 @@ type User struct {
 	Usertype              int           `json:"usertype"`
 }
 
+// Equipment structure contains dictionary of a user's equipment
 type Equipment struct {
 	Camera []string `json:"camera"`
 	Lens   []string `json:"lens"`
+	Misc   []string `json:"misc"`
 }
 
+// Auth structure contains dictionary of a user's social network authentications.
 type Auth struct {
 	Facebook     int `json:"facebook"`
 	GoogleOauth2 int `json:"google_oauth2"`
 	Twitter      int `json:"twitter"`
 }
 
+// Contacts structure contacts dictionary of user’s contacts, object
 type Contacts struct {
 	Facebook     string `json:"facebook"`
 	Facebookpage string `json:"facebookpage"`
@@ -67,21 +76,27 @@ type Contacts struct {
 	Website      string `json:"website"`
 }
 
-type UrlInfo struct {
+// URLInfo is used in Avatars structure
+type URLInfo struct {
 	HTTP  string `json:"http"`
 	HTTPS string `json:"https"`
 }
 
+// Avatars is a dictionary of different avatar sizes
 type Avatars struct {
-	Default UrlInfo `json:"default"`
-	Large   UrlInfo `json:"large"`
-	Small   UrlInfo `json:"small"`
-	Tiny    UrlInfo `json:"tiny"`
+	Default URLInfo `json:"default"`
+	Large   URLInfo `json:"large"`
+	Small   URLInfo `json:"small"`
+	Tiny    URLInfo `json:"tiny"`
 }
 
+// Friends structure is a list of friends for the specified user
 type Friends struct {
 	Users        []User `json:"friends"`
 	FriendsCount int    `json:"friends_count"`
 	FriendsPages int    `json:"friends_pages"`
 	Page         int    `json:"page"`
 }
+
+// ErrUserNotFound error.
+var ErrUserNotFound = errors.New("User not found")
