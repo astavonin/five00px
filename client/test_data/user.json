@@ -1,0 +1,85 @@
+{
+  "user": {
+    "id": 9091479,
+    "username": "alexanderstavonin",
+    "firstname": "Alexander",
+    "lastname": "Stavonin",
+    "birthday": "1981-01-22",
+    "sex": 1,
+    "city": "Singapore",
+    "state": "",
+    "country": "Singapore",
+    "registration_date": "2014-07-29T15:16:17-04:00",
+    "about": "",
+    "usertype": 0,
+    "domain": "alexanderstavonin.500px.com",
+    "fotomoto_on": false,
+    "locale": "en",
+    "show_nude": true,
+    "allow_sale_requests": 1,
+    "fullname": "Alexander Stavonin",
+    "userpic_url": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/1.jpg?2",
+    "userpic_https_url": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/1.jpg?2",
+    "cover_url": null,
+    "upgrade_status": 0,
+    "store_on": false,
+    "photos_count": 52,
+    "galleries_count": 6,
+    "affection": 626,
+    "in_favorites_count": 347,
+    "friends_count": 26,
+    "followers_count": 15,
+    "analytics_code": null,
+    "invite_pending": false,
+    "invite_accepted": false,
+    "email": "alex@sysdev.me",
+    "upload_limit": 20,
+    "upload_limit_expiry": "2016-02-27T09:05:02-05:00",
+    "upgrade_type": 0,
+    "upgrade_status_expiry": "2015-10-20",
+    "auth": {
+      "facebook": 1,
+      "twitter": 1,
+      "google_oauth2": 0
+    },
+    "presubmit_for_licensing": null,
+    "custom_license_prices": [],
+    "contacts": {
+      "facebook": "100007153785480",
+      "website": "www.alexst.me",
+      "skype": "stavonin_alexander",
+      "facebookpage": "www.facebook.com/a.stavonin",
+      "twitter": "a_stavonin",
+      "googleplus": "www.google.com/+AlexanderStavonin"
+    },
+    "equipment": {
+      "camera": [
+        "Canon EOS 5D Mk. III",
+        "Fujifilm X-E2"
+      ],
+      "lens": [
+        "Sigma 24-70 f/2.8",
+        "Sigma 70-200 f/2.8",
+        "Sigma 105 mm f/2.8"
+      ]
+    },
+    "avatars": {
+      "default": {
+        "http": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/1.jpg?2",
+        "https": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/1.jpg?2"
+      },
+      "large": {
+        "http": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/2.jpg?2",
+        "https": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/2.jpg?2"
+      },
+      "small": {
+        "http": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/3.jpg?2",
+        "https": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/3.jpg?2"
+      },
+      "tiny": {
+        "http": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/4.jpg?2",
+        "https": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/4.jpg?2"
+      }
+    }
+  }
+}

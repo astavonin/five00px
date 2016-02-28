@@ -1,0 +1,5 @@
+{
+    "lookup_method": "failed",
+    "error": "Lookup failed: no known user lookup keys",
+    "status": 400
+}
