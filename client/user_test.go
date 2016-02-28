@@ -109,7 +109,8 @@ func TestGetUserByID(t *testing.T) {
 func TestFriends(t *testing.T) {
 	f00 := NewTest500px()
 
-	u, err := f00.Friends(9091479)
+	page := NewPage()
+	u, err := f00.Friends(9091479, &page)
 	if err != nil {
 		t.Fatal(err)
 	}

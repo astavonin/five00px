@@ -19,8 +19,8 @@ func (h httpError) Error() string {
 	return fmt.Sprintf("HTTP error %d. Message: %s", h.ErrorCode, h.Response)
 }
 
-func doGet(c *http.Client, dstPoint string, vals *url.Values) ([]byte, error) {
-	if vals != nil {
+func doGet(c *http.Client, dstPoint string, vals url.Values) ([]byte, error) {
+	if len(vals) > 0 {
 		dstPoint += "?" + vals.Encode()
 	}
 	log := logrus.WithFields(logrus.Fields{

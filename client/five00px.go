@@ -14,6 +14,17 @@ type Five00px struct {
 	oa oAuth
 }
 
+type Page struct {
+	Rpp  int
+	Page int
+}
+
+// NewPage call returns Page with 500px default values `Results Per Page` 20
+// and `Page` 1
+func NewPage() Page {
+	return Page{20, 1}
+}
+
 // New call creates and initiate Five00px object. ConsumerKey and
 // ConsumerSecret have to be provided by user
 func New(key, secret string) Five00px {
@@ -45,7 +56,7 @@ func (f00 *Five00px) Restore(t *AccessToken) error {
 	return nil
 }
 
-func userBy(c *http.Client, dstPoint string, vals *url.Values) (*User, error) {
+func userBy(c *http.Client, dstPoint string, vals url.Values) (*User, error) {
 
 	b, err := doGet(c, dstPoint, vals)
 	if err != nil {
@@ -68,13 +79,11 @@ func userBy(c *http.Client, dstPoint string, vals *url.Values) (*User, error) {
 // UserByID call returns User struct for a user specified by id. If id == 0
 // returns the profile information for the current user.
 func (f00 *Five00px) UserByID(id int) (*User, error) {
-	var (
-		dstPoint = "users"
-		vals     *url.Values
-	)
+	dstPoint := "users"
+	vals := url.Values{}
 	if id != 0 {
 		dstPoint += "/show"
-		vals = &url.Values{"id": {strconv.Itoa(id)}}
+		vals.Add("id", strconv.Itoa(id))
 	}
 
 	return userBy(f00.c, dstPoint, vals)
@@ -83,18 +92,23 @@ func (f00 *Five00px) UserByID(id int) (*User, error) {
 // UserByName returns User struct for a user specified by name.
 func (f00 *Five00px) UserByName(name string) (*User, error) {
 
-	return userBy(f00.c, "users/show", &url.Values{"username": {name}})
+	return userBy(f00.c, "users/show", url.Values{"username": {name}})
 }
 
 // UserByEmail returns User struct for a user specified by email.
 func (f00 *Five00px) UserByEmail(email string) (*User, error) {
 
-	return userBy(f00.c, "users/show", &url.Values{"email": {email}})
+	return userBy(f00.c, "users/show", url.Values{"email": {email}})
 }
 
 // Friends call returns list of friends for a user specified by ID.
-func (f00 *Five00px) Friends(id int) (*Friends, error) {
-	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/friends", nil)
+func (f00 *Five00px) Friends(id int, page *Page) (*Friends, error) {
+	vals := url.Values{}
+	if page != nil {
+		vals.Add("page", strconv.Itoa(page.Page))
+		vals.Add("rpp", strconv.Itoa(page.Rpp))
+	}
+	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/friends", vals)
 
 	var friends Friends
 	err = json.Unmarshal(b, &friends)
