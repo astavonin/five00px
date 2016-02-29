@@ -98,5 +98,13 @@ type Friends struct {
 	Page         int    `json:"page"`
 }
 
+// Followers structure is a list of followers for the specified user
+type Followers struct {
+	Users          []User `json:"followers"`
+	FollowersCount int    `json:"followers_count"`
+	FollowersPages int    `json:"followers_pages"`
+	Page           int    `json:"page"`
+}
+
 // ErrUserNotFound error.
 var ErrUserNotFound = errors.New("User not found")

@@ -71,9 +71,9 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	f, err := f00.Friends(9091479, &five00px.Page{1, 1})
+	fr, err := f00.Friends(9091479, &five00px.Page{1, 1})
 
-	for _, u := range f.Users {
+	for _, u := range fr.Users {
 		fmt.Println(u.Avatars.Default)
 	}
 	u, err := f00.UserByID(9091479)
@@ -81,4 +81,11 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(u.City)
+
+	fl, err := f00.Followers(9091479, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(fl.FollowersCount)
+
 }

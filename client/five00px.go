@@ -14,6 +14,8 @@ type Five00px struct {
 	oa oAuth
 }
 
+// Page structure stores RPP(Results Per Page) and Page(Return the specified
+// page of the resource) values.
 type Page struct {
 	Rpp  int
 	Page int
@@ -110,8 +112,23 @@ func (f00 *Five00px) Friends(id int, page *Page) (*Friends, error) {
 	}
 	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/friends", vals)
 
-	var friends Friends
-	err = json.Unmarshal(b, &friends)
+	var f Friends
+	err = json.Unmarshal(b, &f)
 
-	return &friends, err
+	return &f, err
+}
+
+// Followers call returns list of followers for a user specified by ID.
+func (f00 *Five00px) Followers(id int, page *Page) (*Followers, error) {
+	vals := url.Values{}
+	if page != nil {
+		vals.Add("page", strconv.Itoa(page.Page))
+		vals.Add("rpp", strconv.Itoa(page.Rpp))
+	}
+	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/followers", vals)
+
+	var f Followers
+	err = json.Unmarshal(b, &f)
+
+	return &f, err
 }

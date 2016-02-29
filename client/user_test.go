@@ -43,6 +43,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 	}
 
 	reFriends := regexp.MustCompile(`/users/(\w+)/friends`)
+	reFollowers := regexp.MustCompile(`/users/(\w+)/followers`)
 
 	if u.Path == "/users" {
 		return "user.json", http.StatusOK
@@ -51,6 +52,10 @@ func userHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 	} else if res := reFriends.FindStringSubmatch(u.Path); len(res) > 0 {
 		if res[1] == "9091479" {
 			return "friends.json", http.StatusOK
+		}
+	} else if res := reFollowers.FindStringSubmatch(u.Path); len(res) > 0 {
+		if res[1] == "9091479" {
+			return "followers.json", http.StatusOK
 		}
 	}
 
@@ -115,6 +120,19 @@ func TestFriends(t *testing.T) {
 		t.Fatal(err)
 	}
 	if u.FriendsCount != 25 || u.FriendsPages != 2 || len(u.Users) != 20 {
+		t.Fatal("Invalid user data")
+	}
+}
+
+func TestFollowers(t *testing.T) {
+	f00 := NewTest500px()
+
+	page := NewPage()
+	u, err := f00.Followers(9091479, &page)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if u.FollowersCount != 15 || u.FollowersPages != 1 || len(u.Users) != 15 {
 		t.Fatal("Invalid user data")
 	}
 }
