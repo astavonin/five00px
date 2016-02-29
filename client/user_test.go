@@ -2,6 +2,7 @@
 package five00px
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -47,6 +48,12 @@ func userHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 
 	if u.Path == "/users" {
 		return "user.json", http.StatusOK
+	} else if u.Path == "/users/search" {
+		m, _ := url.ParseQuery(u.RawQuery)
+		if m["term"][0] == "@@@" {
+			return "search_empty.json", http.StatusOK
+		}
+		return "search.json", http.StatusOK
 	} else if u.Path == "/users/show" {
 		return handleShow(u)
 	} else if res := reFriends.FindStringSubmatch(u.Path); len(res) > 0 {
@@ -133,6 +140,30 @@ func TestFollowers(t *testing.T) {
 		t.Fatal(err)
 	}
 	if u.FollowersCount != 15 || u.FollowersPages != 1 || len(u.Users) != 15 {
+		t.Fatal("Invalid user data")
+	}
+}
+
+func TestSearch(t *testing.T) {
+	f00 := NewTest500px()
+
+	page := NewPage()
+	s, err := f00.Search("@@@", &page)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("QQQQ", s.TotalItems, s.CurrentPage, len(s.Users))
+	if s.TotalItems != 0 || s.CurrentPage != 1 || len(s.Users) != 0 {
+		t.Fatal("Invalid user data")
+	}
+	// ----
+
+	page.Rpp = 19
+	s, err = f00.Search("empty", &page)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if s.TotalItems != 7715 || s.CurrentPage != 1 || len(s.Users) != 19 {
 		t.Fatal("Invalid user data")
 	}
 }

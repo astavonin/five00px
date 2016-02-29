@@ -104,13 +104,8 @@ func (f00 *Five00px) UserByEmail(email string) (*User, error) {
 }
 
 // Friends call returns list of friends for a user specified by ID.
-func (f00 *Five00px) Friends(id int, page *Page) (*Friends, error) {
-	vals := url.Values{}
-	if page != nil {
-		vals.Add("page", strconv.Itoa(page.Page))
-		vals.Add("rpp", strconv.Itoa(page.Rpp))
-	}
-	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/friends", vals)
+func (f00 *Five00px) Friends(id int, p *Page) (*Friends, error) {
+	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/friends", pageToVals(p))
 
 	var f Friends
 	err = json.Unmarshal(b, &f)
@@ -119,16 +114,24 @@ func (f00 *Five00px) Friends(id int, page *Page) (*Friends, error) {
 }
 
 // Followers call returns list of followers for a user specified by ID.
-func (f00 *Five00px) Followers(id int, page *Page) (*Followers, error) {
-	vals := url.Values{}
-	if page != nil {
-		vals.Add("page", strconv.Itoa(page.Page))
-		vals.Add("rpp", strconv.Itoa(page.Rpp))
-	}
-	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/followers", vals)
+func (f00 *Five00px) Followers(id int, p *Page) (*Followers, error) {
+	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/followers", pageToVals(p))
 
 	var f Followers
 	err = json.Unmarshal(b, &f)
 
 	return &f, err
+}
+
+// Search call returns list of users (up to one hundred) users from search
+// results for a specified search term
+func (f00 *Five00px) Search(term string, p *Page) (*Search, error) {
+	v := pageToVals(p)
+	v.Add("term", term)
+	b, err := doGet(f00.c, "users/search", v)
+
+	var s Search
+	err = json.Unmarshal(b, &s)
+
+	return &s, err
 }

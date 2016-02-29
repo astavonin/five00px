@@ -1,8 +1,6 @@
 // Package five00px provides ...
 package five00px
 
-import "errors"
-
 // User 500px structure. See https://github.com/500px/api-documentation/blob/master/basics/formats_and_terms.md#full-format
 // for additional information.
 type User struct {
@@ -106,5 +104,10 @@ type Followers struct {
 	Page           int    `json:"page"`
 }
 
-// ErrUserNotFound error.
-var ErrUserNotFound = errors.New("User not found")
+// Search structure (up to one hundred) users from search results for a specified search term.
+type Search struct {
+	Users       []User `json:"users"`
+	CurrentPage int    `json:"current_page"`
+	TotalPages  int    `json:"total_pages"`
+	TotalItems  int    `json:"total_items"`
+}
