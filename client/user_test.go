@@ -11,6 +11,24 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
+func handleAddFriend(id string) (string, int) {
+	switch id {
+	case "42":
+		return "friends_already.json", http.StatusForbidden
+	case "100":
+		return "friends_add.json", http.StatusOK
+	}
+	return "404.json", http.StatusNotFound
+}
+
+func handleSearch(u *url.URL) (string, int) {
+	m, _ := url.ParseQuery(u.RawQuery)
+	if m["term"][0] == "@@@" {
+		return "search_empty.json", http.StatusOK
+	}
+	return "search.json", http.StatusOK
+}
+
 func handleShow(u *url.URL) (string, int) {
 	if u.RawQuery == "" {
 		return "400.json", http.StatusBadRequest
@@ -49,13 +67,11 @@ func userHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 	if u.Path == "/users" {
 		return "user.json", http.StatusOK
 	} else if u.Path == "/users/search" {
-		m, _ := url.ParseQuery(u.RawQuery)
-		if m["term"][0] == "@@@" {
-			return "search_empty.json", http.StatusOK
-		}
-		return "search.json", http.StatusOK
+		return handleSearch(u)
 	} else if u.Path == "/users/show" {
 		return handleShow(u)
+	} else if res := reFriends.FindStringSubmatch(u.Path); len(res) > 0 && r.Method == http.MethodPost {
+		return handleAddFriend(res[1])
 	} else if res := reFriends.FindStringSubmatch(u.Path); len(res) > 0 {
 		if res[1] == "9091479" {
 			return "friends.json", http.StatusOK
@@ -148,7 +164,7 @@ func TestSearch(t *testing.T) {
 	f00 := NewTest500px()
 
 	page := NewPage()
-	s, err := f00.Search("@@@", &page)
+	s, err := f00.Search("@@@", &page) // will not find
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -165,5 +181,24 @@ func TestSearch(t *testing.T) {
 	}
 	if s.TotalItems != 7715 || s.CurrentPage != 1 || len(s.Users) != 19 {
 		t.Fatal("Invalid user data")
+	}
+}
+
+func TestAddFriend(t *testing.T) {
+	f00 := NewTest500px()
+
+	_, err := f00.AddFriend(42) // already friends
+	if err != ErrUserAlreadyFriend {
+		t.Fatal("Should be error here")
+	}
+
+	_, err = f00.AddFriend(0) // not exists
+	if err != ErrUserNotFound {
+		t.Fatal("Should be error here")
+	}
+
+	_, err = f00.AddFriend(100) // new friend
+	if err != nil {
+		t.Fatal(err)
 	}
 }

@@ -107,6 +107,10 @@ func (f00 *Five00px) UserByEmail(email string) (*User, error) {
 func (f00 *Five00px) Friends(id int, p *Page) (*Friends, error) {
 	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/friends", pageToVals(p))
 
+	if err != nil {
+		return nil, err
+	}
+
 	var f Friends
 	err = json.Unmarshal(b, &f)
 
@@ -116,6 +120,10 @@ func (f00 *Five00px) Friends(id int, p *Page) (*Friends, error) {
 // Followers call returns list of followers for a user specified by ID.
 func (f00 *Five00px) Followers(id int, p *Page) (*Followers, error) {
 	b, err := doGet(f00.c, "users/"+strconv.Itoa(id)+"/followers", pageToVals(p))
+
+	if err != nil {
+		return nil, err
+	}
 
 	var f Followers
 	err = json.Unmarshal(b, &f)
@@ -130,8 +138,34 @@ func (f00 *Five00px) Search(term string, p *Page) (*Search, error) {
 	v.Add("term", term)
 	b, err := doGet(f00.c, "users/search", v)
 
+	if err != nil {
+		return nil, err
+	}
+
 	var s Search
 	err = json.Unmarshal(b, &s)
 
 	return &s, err
+}
+
+func (f00 *Five00px) AddFriend(id int) (*User, error) {
+	b, err := doPost(f00.c, "users/"+strconv.Itoa(id)+"/friends")
+
+	if err != nil {
+		var e00 five00Error
+		err = json.Unmarshal(b, &e00)
+		if err != nil {
+			return nil, ErrInternal
+		}
+		switch e00.Status {
+		case http.StatusNotFound:
+			return nil, ErrUserNotFound
+		case http.StatusForbidden:
+			return nil, ErrUserAlreadyFriend
+		}
+	}
+
+	var f User
+	err = json.Unmarshal(b, &f)
+	return &f, err
 }

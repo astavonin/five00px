@@ -1,0 +1,33 @@
+{
+  "user": {
+    "id": 42,
+    "username": "kruchkov",
+    "firstname": "Kirill",
+    "lastname": "Kruchkov",
+    "city": "Moscow",
+    "country": "Russia",
+    "usertype": 0,
+    "fullname": "Kirill Kruchkov",
+    "userpic_url": "https://pacdn.500px.org/42/f05660b86bd125f54883c41741176f1aebca846c/1.jpg?8",
+    "userpic_https_url": "https://pacdn.500px.org/42/f05660b86bd125f54883c41741176f1aebca846c/1.jpg?8",
+    "cover_url": null,
+    "upgrade_status": 0,
+    "store_on": true,
+    "affection": 8,
+    "followers_count": 5,
+    "avatars": {
+      "default": {
+        "https": "https://pacdn.500px.org/42/f05660b86bd125f54883c41741176f1aebca846c/1.jpg?8"
+      },
+      "large": {
+        "https": "https://pacdn.500px.org/42/f05660b86bd125f54883c41741176f1aebca846c/2.jpg?8"
+      },
+      "small": {
+        "https": "https://pacdn.500px.org/42/f05660b86bd125f54883c41741176f1aebca846c/3.jpg?8"
+      },
+      "tiny": {
+        "https": "https://pacdn.500px.org/42/f05660b86bd125f54883c41741176f1aebca846c/4.jpg?8"
+      }
+    }
+  }
+}
