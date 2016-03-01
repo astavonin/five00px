@@ -52,6 +52,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	if status != 200 {
 		http.Error(w, string(b), status)
+		return
 	}
 	_, _ = w.Write(b)
 }
