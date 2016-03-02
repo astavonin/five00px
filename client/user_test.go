@@ -11,6 +11,16 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
+func handleDelFriend(id string) (string, int) {
+	switch id {
+	case "42":
+		return "friends_del.json", http.StatusOK
+	case "100":
+		return "friends_no_friend.json", http.StatusForbidden
+	}
+	return "404.json", http.StatusNotFound
+}
+
 func handleAddFriend(id string) (string, int) {
 	switch id {
 	case "42":
@@ -70,6 +80,8 @@ func userHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 		return handleSearch(u)
 	} else if u.Path == "/users/show" {
 		return handleShow(u)
+	} else if res := reFriends.FindStringSubmatch(u.Path); len(res) > 0 && r.Method == http.MethodDelete {
+		return handleDelFriend(res[1])
 	} else if res := reFriends.FindStringSubmatch(u.Path); len(res) > 0 && r.Method == http.MethodPost {
 		return handleAddFriend(res[1])
 	} else if res := reFriends.FindStringSubmatch(u.Path); len(res) > 0 {
@@ -200,5 +212,24 @@ func TestAddFriend(t *testing.T) {
 	_, err = f00.AddFriend(100) // new friend
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestDelFriend(t *testing.T) {
+	f00 := NewTest500px()
+
+	_, err := f00.DelFriend(42) // we are friends
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = f00.DelFriend(0) // not exists
+	if err != ErrUserNotFound {
+		t.Errorf("Expecting \"%s\", found \"%s\"", ErrUserNotFound, err)
+	}
+
+	_, err = f00.DelFriend(100) // not a friend
+	if err != ErrUserNotFriend {
+		t.Errorf("Expecting \"%s\", found \"%s\"", ErrUserNotFriend, err)
 	}
 }

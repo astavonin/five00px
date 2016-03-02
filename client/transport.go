@@ -34,7 +34,7 @@ func doPost(c *http.Client, dstPoint string) ([]byte, error) {
 		_ = r.Body.Close()
 	}()
 	if err != nil {
-		log.WithError(err)
+		log.WithError(err).Error("Posting error")
 		return nil, err
 	} else if r.StatusCode != 200 {
 		b, err := ioutil.ReadAll(r.Body)
@@ -52,10 +52,50 @@ func doPost(c *http.Client, dstPoint string) ([]byte, error) {
 
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.WithError(err)
+		log.WithError(err).Error("Reading error")
 		return nil, err
 	}
-	log.Info("Succeed")
+	log.Info("Done")
+	return b, nil
+}
+
+func doDel(c *http.Client, dstPoint string) ([]byte, error) {
+	log := logrus.WithFields(logrus.Fields{
+		"context": "HTTP DELETE",
+		"host":    mainAPIUrl,
+		"path":    dstPoint,
+	})
+
+	log.Info("Deleting data")
+
+	req, err := http.NewRequest("DELETE", mainAPIUrl+dstPoint, nil)
+	r, err := c.Do(req)
+	defer func() {
+		_ = r.Body.Close()
+	}()
+	if err != nil {
+		log.WithError(err).Error("Deleting error")
+		return nil, err
+	} else if r.StatusCode != 200 {
+		b, err := ioutil.ReadAll(r.Body)
+		d := ""
+		if err == nil {
+			d = string(b)
+		}
+
+		log.WithFields(logrus.Fields{
+			"StatusCode": r.StatusCode,
+			"data":       d,
+		}).Warn("Server returns error")
+		return b, httpError{r.StatusCode, d}
+	}
+
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.WithError(err).Error("Reading error")
+		return nil, err
+	}
+	log.Info("Done")
 	return b, nil
 }
 
@@ -76,7 +116,7 @@ func doGet(c *http.Client, dstPoint string, vals url.Values) ([]byte, error) {
 		_ = r.Body.Close()
 	}()
 	if err != nil {
-		log.WithError(err)
+		log.WithError(err).Error("Getting error")
 		return nil, err
 	} else if r.StatusCode != 200 {
 		b, err := ioutil.ReadAll(r.Body)
@@ -94,9 +134,9 @@ func doGet(c *http.Client, dstPoint string, vals url.Values) ([]byte, error) {
 
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.WithError(err)
-		return nil, err
+		log.WithError(err).Error("Reading error")
+		return b, err
 	}
-	log.Info("Succeed")
+	log.Info("Done")
 	return b, nil
 }

@@ -88,4 +88,9 @@ func main() {
 	}
 	fmt.Println(fl.FollowersCount)
 
+	u, err = f00.AddFriend(42)
+	fmt.Println(err)
+
+	u, err = f00.DelFriend(42)
+	fmt.Println(err)
 }
