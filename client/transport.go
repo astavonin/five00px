@@ -2,7 +2,6 @@
 package five00px
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -20,61 +19,26 @@ func (h httpError) Error() string {
 	return fmt.Sprintf("HTTP error %d. Message: %s", h.ErrorCode, h.Response)
 }
 
-func doPost(c *http.Client, dstPoint string) ([]byte, error) {
+func doCommand(c *http.Client, dstPoint, method string, vals url.Values) ([]byte, error) {
+	if len(vals) > 0 {
+		dstPoint += "?" + vals.Encode()
+	}
 	log := logrus.WithFields(logrus.Fields{
-		"context": "HTTP POST",
+		"context": "HTTP " + method,
 		"host":    mainAPIUrl,
 		"path":    dstPoint,
-	})
-	log.Info("Posting data")
-
-	var buf []byte
-	r, err := c.Post(mainAPIUrl+dstPoint, "text/html", bytes.NewBuffer(buf))
-	defer func() {
-		_ = r.Body.Close()
-	}()
-	if err != nil {
-		log.WithError(err).Error("Posting error")
-		return nil, err
-	} else if r.StatusCode != 200 {
-		b, err := ioutil.ReadAll(r.Body)
-		d := ""
-		if err == nil {
-			d = string(b)
-		}
-
-		log.WithFields(logrus.Fields{
-			"StatusCode": r.StatusCode,
-			"data":       d,
-		}).Warn("Server returns error")
-		return b, httpError{r.StatusCode, d}
-	}
-
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.WithError(err).Error("Reading error")
-		return nil, err
-	}
-	log.Info("Done")
-	return b, nil
-}
-
-func doDel(c *http.Client, dstPoint string) ([]byte, error) {
-	log := logrus.WithFields(logrus.Fields{
-		"context": "HTTP DELETE",
-		"host":    mainAPIUrl,
-		"path":    dstPoint,
+		"values":  vals,
 	})
 
-	log.Info("Deleting data")
+	log.Info("Initiating request")
 
-	req, err := http.NewRequest("DELETE", mainAPIUrl+dstPoint, nil)
+	req, err := http.NewRequest(method, mainAPIUrl+dstPoint, nil)
 	r, err := c.Do(req)
 	defer func() {
 		_ = r.Body.Close()
 	}()
 	if err != nil {
-		log.WithError(err).Error("Deleting error")
+		log.WithError(err).Error("Request failed")
 		return nil, err
 	} else if r.StatusCode != 200 {
 		b, err := ioutil.ReadAll(r.Body)
@@ -88,48 +52,6 @@ func doDel(c *http.Client, dstPoint string) ([]byte, error) {
 			"data":       d,
 		}).Warn("Server returns error")
 		return b, httpError{r.StatusCode, d}
-	}
-
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.WithError(err).Error("Reading error")
-		return nil, err
-	}
-	log.Info("Done")
-	return b, nil
-}
-
-func doGet(c *http.Client, dstPoint string, vals url.Values) ([]byte, error) {
-	if len(vals) > 0 {
-		dstPoint += "?" + vals.Encode()
-	}
-	log := logrus.WithFields(logrus.Fields{
-		"context": "HTTP GET",
-		"host":    mainAPIUrl,
-		"path":    dstPoint,
-	})
-
-	log.Info("Getting data")
-
-	r, err := c.Get(mainAPIUrl + dstPoint)
-	defer func() {
-		_ = r.Body.Close()
-	}()
-	if err != nil {
-		log.WithError(err).Error("Getting error")
-		return nil, err
-	} else if r.StatusCode != 200 {
-		b, err := ioutil.ReadAll(r.Body)
-		d := ""
-		if err == nil {
-			d = string(b)
-		}
-
-		log.WithFields(logrus.Fields{
-			"StatusCode": r.StatusCode,
-			"data":       d,
-		}).Warn("Server returns error")
-		return nil, httpError{r.StatusCode, d}
 	}
 
 	b, err := ioutil.ReadAll(r.Body)
