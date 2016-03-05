@@ -26,7 +26,7 @@ func buildQuery(v url.Values) string {
 		return ""
 	}
 	var buf bytes.Buffer
-	_, _ := buf.WriteString("?")
+	_, _ = buf.WriteString("?")
 	keys := make([]string, 0, len(v))
 	for k := range v {
 		keys = append(keys, k)
