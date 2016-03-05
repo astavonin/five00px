@@ -17,7 +17,7 @@ type Validator interface {
 // PhotoCriterias section
 
 // PhotoCriterias ...
-type PhotoCriterias struct {
+type StreamCriterias struct {
 	Feature       Feature
 	Only          Categories
 	Exclude       Categories
@@ -27,12 +27,18 @@ type PhotoCriterias struct {
 }
 
 // Valid returns true if PhotoCriterias a valid for futher usage
-func (p *PhotoCriterias) Valid() bool {
+func (p *StreamCriterias) Valid() bool {
 	return p.Feature.Valid()
 }
 
+func NewPhotoCriterias() *StreamCriterias {
+	return &StreamCriterias{
+		Feature: FeaturePopular,
+	}
+}
+
 // Vals converts PhotoCriterias to url.Values
-func (p *PhotoCriterias) Vals() url.Values {
+func (p *StreamCriterias) Vals() url.Values {
 	vals := url.Values{}
 	if p != nil {
 		vals.Add("feature", p.Feature.String())
@@ -48,7 +54,7 @@ func (p *PhotoCriterias) Vals() url.Values {
 		if p.SortDirection.Valid() {
 			vals.Add("sort_direction", p.SortDirection.String())
 		}
-		if int(p.ImageSize) > 0 {
+		if p.ImageSize.Valid() {
 			vals.Add("image_size", p.ImageSize.String())
 		}
 		vals.Add("include_store", "1")
@@ -218,4 +224,107 @@ func (s SortOrder) Valid() bool {
 
 	}
 	return false
+}
+
+// Search section
+
+// SearchCriterias intro information for photo search request
+type SearchCriterias struct {
+	Term        string
+	Tag         string
+	Geo         Geo
+	Only        Categories
+	Exclude     Categories
+	ImageSize   Size
+	LicenseType License
+	Sort        SortBy
+}
+
+func NewSearchCriterias() *SearchCriterias {
+	return &SearchCriterias{
+		LicenseType: LicAll,
+	}
+}
+
+func (s *SearchCriterias) Valid() bool {
+	return s.Term != "" || s.Tag != ""
+}
+
+func (s *SearchCriterias) Vals() url.Values {
+	vals := url.Values{}
+	if s != nil {
+		if s.Term != "" {
+			vals.Add("term", s.Term)
+		}
+		if s.Tag != "" {
+			vals.Add("tag", s.Tag)
+		}
+		if s.Geo.Valid() {
+			vals.Add("geo", s.Geo.String())
+		}
+		if s.Exclude.Valid() {
+			vals.Add("only", s.Exclude.String())
+		}
+		if s.Only.Valid() {
+			vals.Add("only", s.Only.String())
+		}
+		if s.ImageSize.Valid() {
+			vals.Add("image_size", s.ImageSize.String())
+		}
+		if s.LicenseType.Valid() {
+			vals.Add("license_type", s.LicenseType.String())
+		}
+		vals.Add("tags", "1")
+	}
+	return vals
+}
+
+// Geo geo-location point
+type Geo struct {
+	Latitude  string
+	Longitude string
+	Radius    string
+	Units     Units
+}
+
+func (u Units) String() string {
+	return string(u)
+}
+
+// Valid units are km and mi
+func (u Units) Valid() bool {
+	switch u {
+	case UnitsMi,
+		UnitsKm:
+		return true
+	}
+	return false
+}
+
+// Valid units are km and mi
+func (g Geo) Valid() bool {
+	return g.Units.Valid()
+}
+
+func (g Geo) String() string {
+	return g.Latitude + "," + g.Longitude + "," + g.Radius + "<" + g.Units.String() + ">"
+}
+
+// Valid license type
+func (l License) Valid() bool {
+	switch l {
+	case Lic500px,
+		LicCrCommonNonComAttr,
+		LicCrCommonNonComNoDeriv,
+		LicCrCommonNonComShare,
+		LicCrCommonAttr,
+		LicCrCommonNoDeriv,
+		LicCrCommonShare:
+		return true
+	}
+	return false
+}
+
+func (l License) String() string {
+	return strconv.Itoa(int(l))
 }

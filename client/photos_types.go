@@ -95,6 +95,12 @@ type SortBy string
 // SortOrder helper type
 type SortOrder string
 
+// Units helper type
+type Units string
+
+// License type
+type License int
+
 // Constants
 const (
 	FeaturePopular        = Feature("popular")
@@ -123,6 +129,7 @@ const (
 	Size1600l   = Size(1600)
 	Size2048l   = Size(2048)
 
+	CategoryAll              = Category(-1)
 	CategoryUncategorized    = Category(0)
 	CategoryAbstract         = Category(10)
 	CategoryAnimals          = Category(11)
@@ -162,6 +169,18 @@ const (
 
 	SortOrderAsk  = SortOrder("ask")
 	SortOrderDesk = SortOrder("desk")
+
+	UnitsKm = Units("km")
+	UnitsMi = Units("mi")
+
+	LicAll                   = License(-1)
+	Lic500px                 = License(0)
+	LicCrCommonNonComAttr    = License(1)
+	LicCrCommonNonComNoDeriv = License(2)
+	LicCrCommonNonComShare   = License(3)
+	LicCrCommonAttr          = License(4)
+	LicCrCommonNoDeriv       = License(5)
+	LicCrCommonShare         = License(6)
 )
 
 var categoriesMap = map[Category]string{

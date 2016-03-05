@@ -94,7 +94,7 @@ func main() {
 	u, err = f00.DelFriend(42)
 	fmt.Println(err)
 
-	s := five00px.PhotoCriterias{
+	s := five00px.StreamCriterias{
 		Feature: five00px.FeaturePopular,
 	}
 	p := five00px.Page{
@@ -102,4 +102,18 @@ func main() {
 	}
 	photos, err := f00.Photos(s, &p)
 	fmt.Println("", len(photos.Photos), photos.TotalPages, photos.TotalItems)
+
+	sCrit := five00px.SearchCriterias{
+		Term:        "test",
+		Tag:         "best",
+		LicenseType: five00px.LicAll,
+	}
+
+	photos, err = f00.PhotosSearch(sCrit, &p)
+
+	if err != nil || photos.CurrentPage != 1 || photos.TotalItems != 84 ||
+		photos.TotalPages != 28 || len(photos.Photos) != 3 {
+		log.Fatal(err)
+	}
+
 }

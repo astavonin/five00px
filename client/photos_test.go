@@ -9,13 +9,17 @@ import (
 )
 
 func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
-	_, err := url.Parse(r.URL.String())
+	u, err := url.Parse(r.URL.String())
 	if err != nil {
 		return "", http.StatusInternalServerError
 	}
 
-	return "photos.json", http.StatusOK
-	//return "", http.StatusInternalServerError
+	if u.Path == "/photos" {
+		return "photos.json", http.StatusOK
+	} else if u.Path == "/photos/search" {
+		return "photos_search.json", http.StatusOK
+	}
+	return "", http.StatusInternalServerError
 }
 
 func TestCategory(t *testing.T) {
@@ -37,7 +41,7 @@ func TestPhotos(t *testing.T) {
 	f00 := NewTest500px()
 
 	// Valid request
-	s := PhotoCriterias{
+	s := StreamCriterias{
 		Feature: FeaturePopular,
 	}
 
@@ -56,5 +60,30 @@ func TestPhotos(t *testing.T) {
 	f, err = f00.Photos(s, nil)
 	if err != ErrInvalidInput {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrInvalidInput, err)
+	}
+}
+
+func TestPhotosSearch(t *testing.T) {
+	f00 := NewTest500px()
+	c := SearchCriterias{
+		Term:        "test",
+		Tag:         "best",
+		LicenseType: LicAll,
+	}
+
+	cRes := buildQuery(c.Vals())
+	cExp := "?tag=best&tags=1&term=test"
+	if cRes != cExp {
+		t.Errorf("Expecting:\t%s\nFound:\t%s", cExp, cRes)
+	}
+
+	p, err := f00.PhotosSearch(c, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if p.CurrentPage != 1 || p.TotalItems != 84 || p.TotalPages != 28 ||
+		len(p.Photos) != 3 {
+		t.Error("Unexpected data")
 	}
 }

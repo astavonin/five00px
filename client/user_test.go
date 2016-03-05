@@ -169,11 +169,11 @@ func TestFollowers(t *testing.T) {
 	}
 }
 
-func TestSearch(t *testing.T) {
+func TestPhotoSearch(t *testing.T) {
 	f00 := NewTest500px()
 
 	page := NewPage()
-	s, err := f00.Search("@@@", &page) // will not find
+	s, err := f00.UserSearch("@@@", &page) // will not find
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -184,7 +184,7 @@ func TestSearch(t *testing.T) {
 	// ----
 
 	page.Rpp = 19
-	s, err = f00.Search("empty", &page)
+	s, err = f00.UserSearch("empty", &page)
 	if err != nil {
 		t.Fatal(err)
 	}

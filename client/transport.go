@@ -37,10 +37,10 @@ func buildQuery(v url.Values) string {
 		prefix := k + "="
 		for _, v := range vs {
 			if buf.Len() > 1 {
-				buf.WriteByte('&')
+				_ = buf.WriteByte('&')
 			}
-			buf.WriteString(urlEncode(prefix))
-			buf.WriteString(urlEncode(v))
+			_, _ = buf.WriteString(urlEncode(prefix))
+			_, _ = buf.WriteString(urlEncode(v))
 		}
 	}
 	return buf.String()

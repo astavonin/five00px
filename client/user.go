@@ -108,9 +108,9 @@ func (f00 *Five00px) Followers(id int, p *Page) (*Followers, error) {
 	return &f, err
 }
 
-// Search call returns list of users (up to one hundred) users from search
+// UserSearch call returns list of users (up to one hundred) users from search
 // results for a specified search term
-func (f00 *Five00px) Search(term string, p *Page) (*Search, error) {
+func (f00 *Five00px) UserSearch(term string, p *Page) (*Search, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Search",
 		"term":    term,
