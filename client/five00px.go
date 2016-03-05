@@ -9,19 +9,6 @@ type Five00px struct {
 	oa oAuth
 }
 
-// Page structure stores RPP(Results Per Page) and Page(Return the specified
-// page of the resource) values.
-type Page struct {
-	Rpp  int
-	Page int
-}
-
-// NewPage call returns Page with 500px default values `Results Per Page` 20
-// and `Page` 1
-func NewPage() Page {
-	return Page{20, 1}
-}
-
 // New call creates and initiate Five00px object. ConsumerKey and
 // ConsumerSecret have to be provided by user
 func New(key, secret string) Five00px {

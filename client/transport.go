@@ -2,10 +2,12 @@
 package five00px
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sort"
 
 	"github.com/Sirupsen/logrus"
 )
@@ -19,10 +21,35 @@ func (h httpError) Error() string {
 	return fmt.Sprintf("HTTP error %d. Message: %s", h.ErrorCode, h.Response)
 }
 
-func doCommand(c *http.Client, dstPoint, method string, vals url.Values) ([]byte, error) {
-	if len(vals) > 0 {
-		dstPoint += "?" + vals.Encode()
+func buildQuery(v url.Values) string {
+	if v == nil {
+		return ""
 	}
+	var buf bytes.Buffer
+	_, _ := buf.WriteString("?")
+	keys := make([]string, 0, len(v))
+	for k := range v {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		vs := v[k]
+		prefix := k + "="
+		for _, v := range vs {
+			if buf.Len() > 1 {
+				buf.WriteByte('&')
+			}
+			buf.WriteString(urlEncode(prefix))
+			buf.WriteString(urlEncode(v))
+		}
+	}
+	return buf.String()
+}
+
+func doCommand(c *http.Client, dstPoint, method string, vals url.Values) ([]byte, error) {
+
+	dstPoint += buildQuery(vals)
+
 	log := logrus.WithFields(logrus.Fields{
 		"context": "HTTP " + method,
 		"host":    mainAPIUrl,

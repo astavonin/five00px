@@ -93,4 +93,13 @@ func main() {
 
 	u, err = f00.DelFriend(42)
 	fmt.Println(err)
+
+	s := five00px.PhotoCriterias{
+		Feature: five00px.FeaturePopular,
+	}
+	p := five00px.Page{
+		Rpp: 3,
+	}
+	photos, err := f00.Photos(s, &p)
+	fmt.Println("", len(photos.Photos), photos.TotalPages, photos.TotalItems)
 }

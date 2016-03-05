@@ -28,6 +28,7 @@ func registerHandlers() {
 	handlers = make(map[string]TestHandlerFunc)
 
 	handlers["users"] = userHandler
+	handlers["photos"] = photosHandler
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {

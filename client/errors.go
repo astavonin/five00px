@@ -15,6 +15,9 @@ var ErrUserAlreadyFriend = errors.New("The user requested has been disabled or a
 // ErrUserNotFriend ...
 var ErrUserNotFriend = errors.New("The user requested has been disabled or not in followers list")
 
+// ErrInvalidInput ...
+var ErrInvalidInput = errors.New("Invalid user input")
+
 type five00Error struct {
 	Error  string `json:"error"`
 	Status int    `json:"status"`

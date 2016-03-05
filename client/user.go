@@ -72,7 +72,7 @@ func (f00 *Five00px) Friends(id int, p *Page) (*Friends, error) {
 	})
 
 	b, err := doCommand(f00.c, "users/"+strconv.Itoa(id)+"/friends", http.MethodGet,
-		pageToVals(p))
+		p.Vals())
 
 	if err != nil {
 		log.WithError(err).Warn("Failed to GET data")
@@ -94,7 +94,7 @@ func (f00 *Five00px) Followers(id int, p *Page) (*Followers, error) {
 		"page":    p,
 	})
 	b, err := doCommand(f00.c, "users/"+strconv.Itoa(id)+"/followers",
-		http.MethodGet, pageToVals(p))
+		http.MethodGet, p.Vals())
 
 	if err != nil {
 		log.WithError(err).Warn("Failed to GET data")
@@ -116,7 +116,7 @@ func (f00 *Five00px) Search(term string, p *Page) (*Search, error) {
 		"term":    term,
 		"page":    p,
 	})
-	v := pageToVals(p)
+	v := p.Vals()
 	v.Add("term", term)
 	b, err := doCommand(f00.c, "users/search", http.MethodGet, v)
 

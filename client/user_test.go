@@ -7,8 +7,6 @@ import (
 	"net/url"
 	"regexp"
 	"testing"
-
-	"github.com/Sirupsen/logrus"
 )
 
 func handleDelFriend(id string) (string, int) {
@@ -67,7 +65,6 @@ func userHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		logrus.Error(err)
 		return "", http.StatusInternalServerError
 	}
 
