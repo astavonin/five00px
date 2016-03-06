@@ -24,6 +24,10 @@ var ErrPhotoNotFound = errors.New("Photo with the specified ID does not exist")
 // ErrPhotoNotAvailable
 var ErrPhotoNotAvailable = errors.New("The photo was either deleted, belongs to a deactivated user")
 
+var ErrVoteRejected = errors.New("The vote has been rejected; common reasons are:" +
+	" current user is inactive, has not completed their profile, is trying to vote" +
+	" on their own photo, or has already voted for the photo")
+
 type five00Error struct {
 	Error  string `json:"error"`
 	Status int    `json:"status"`

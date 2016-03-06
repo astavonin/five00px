@@ -1,0 +1,6 @@
+{
+    "error": "Sorry, you have already voted for this Photo.",
+    "status": 403,
+    "error_code": "already_voted",
+    "needs_reason": null
+}

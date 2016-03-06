@@ -4,6 +4,7 @@ package five00px
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/Sirupsen/logrus"
@@ -83,7 +84,10 @@ func (f00 *Five00px) PhotoById(id int, info *PhotoInfo) (*Photo, error) {
 	vals := info.Vals()
 	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id), http.MethodGet, vals)
 	if err != nil {
-		return nil, processError(log, b)
+		return nil, processError(log, b, ErrorTable{
+			http.StatusNotFound:  ErrPhotoNotFound,
+			http.StatusForbidden: ErrPhotoNotAvailable,
+		})
 	}
 
 	var objmap map[string]*json.RawMessage
@@ -102,7 +106,9 @@ func (f00 *Five00px) PhotoById(id int, info *PhotoInfo) (*Photo, error) {
 	return &photo, err
 }
 
-func processError(log *logrus.Entry, b []byte) error {
+type ErrorTable map[int]error
+
+func processError(log *logrus.Entry, b []byte, errTbl ErrorTable) error {
 	var e00 five00Error
 	err := json.Unmarshal(b, &e00)
 	if err != nil {
@@ -112,13 +118,7 @@ func processError(log *logrus.Entry, b []byte) error {
 	}
 	log.WithField("status", strconv.Itoa(e00.Status)).
 		Info("server returns error")
-	switch e00.Status {
-	case http.StatusNotFound:
-		return ErrPhotoNotFound
-	case http.StatusForbidden:
-		return ErrPhotoNotAvailable
-	}
-	return nil
+	return errTbl[e00.Status]
 }
 
 func (f00 *Five00px) PhotoComments(id int, p *Page) (*Comments, error) {
@@ -130,7 +130,10 @@ func (f00 *Five00px) PhotoComments(id int, p *Page) (*Comments, error) {
 
 	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/comments", http.MethodGet, p.Vals())
 	if err != nil {
-		return nil, processError(log, b)
+		return nil, processError(log, b, ErrorTable{
+			http.StatusNotFound:  ErrPhotoNotFound,
+			http.StatusForbidden: ErrPhotoNotAvailable,
+		})
 	}
 
 	var c Comments
@@ -149,7 +152,10 @@ func (f00 *Five00px) PhotoVotes(id int, p *Page) (*Votes, error) {
 
 	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/votes", http.MethodGet, p.Vals())
 	if err != nil {
-		return nil, processError(log, b)
+		return nil, processError(log, b, ErrorTable{
+			http.StatusNotFound:  ErrPhotoNotFound,
+			http.StatusForbidden: ErrPhotoNotAvailable,
+		})
 	}
 
 	var votes Votes
@@ -157,4 +163,27 @@ func (f00 *Five00px) PhotoVotes(id int, p *Page) (*Votes, error) {
 	err = json.Unmarshal(b, &votes)
 	log.WithError(err).Info("Done")
 	return &votes, err
+}
+
+func (f00 *Five00px) Vote(id int, like bool) error {
+	log := logrus.WithFields(logrus.Fields{
+		"context": "Vote",
+		"id":      id,
+		"like":    like,
+	})
+
+	method := http.MethodPost
+	if !like {
+		method = http.MethodDelete
+	}
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/vote", method, url.Values{})
+	if err != nil {
+		return processError(log, b, ErrorTable{
+			http.StatusNotFound:   ErrPhotoNotFound,
+			http.StatusForbidden:  ErrVoteRejected,
+			http.StatusBadRequest: ErrInvalidInput,
+		})
+	}
+
+	return nil
 }

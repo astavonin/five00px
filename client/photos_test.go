@@ -17,6 +17,19 @@ func handleComments(id string) (string, int) {
 	return "", http.StatusNotFound
 }
 
+func handleVote(id, method string) (string, int) {
+	if id == "101" && method == http.MethodPost {
+		return "vote.json", http.StatusOK
+	} else if id == "101" && method == http.MethodDelete {
+		return "vote_del.json", http.StatusOK
+	} else if id == "42" && method == http.MethodPost {
+		return "404.json", http.StatusNotFound
+	} else if id == "100" && method == http.MethodPost {
+		return "403.json", http.StatusForbidden
+	}
+	return "", http.StatusInternalServerError
+}
+
 func handleVotes(id string) (string, int) {
 	if id == "142795351" {
 		return "photo_votes.json", http.StatusOK
@@ -45,7 +58,8 @@ func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 		return "", http.StatusInternalServerError
 	}
 
-	rePhotoById := regexp.MustCompile(`/photos/(\w+)`)
+	rePhotoById := regexp.MustCompile(`/photos/(\w+)$`)
+	rePhotoVote := regexp.MustCompile(`/photos/(\w+)/vote$`)
 	rePhotoVotes := regexp.MustCompile(`/photos/(\w+)/votes`)
 	rePhotoComments := regexp.MustCompile(`/photos/(\w+)/comments`)
 
@@ -55,6 +69,8 @@ func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 		return "photos_search.json", http.StatusOK
 	} else if res := rePhotoComments.FindStringSubmatch(u.Path); len(res) > 0 {
 		return handleComments(res[1])
+	} else if res := rePhotoVote.FindStringSubmatch(u.Path); len(res) > 0 {
+		return handleVote(res[1], r.Method)
 	} else if res := rePhotoVotes.FindStringSubmatch(u.Path); len(res) > 0 {
 		return handleVotes(res[1])
 	} else if res := rePhotoById.FindStringSubmatch(u.Path); len(res) > 0 {
@@ -202,5 +218,28 @@ func TestComments(t *testing.T) {
 
 	if c.TotalItems != 2 || len(c.Comments) != 2 {
 		t.Error("Unexpected votes")
+	}
+}
+
+func TestVote(t *testing.T) {
+	f00 := NewTest500px()
+
+	err := f00.Vote(42, true)
+	if err != ErrPhotoNotFound {
+		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
+	}
+
+	err = f00.Vote(100, true)
+	if err != ErrVoteRejected {
+		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrVoteRejected, err)
+	}
+
+	err = f00.Vote(101, true)
+	if err != nil {
+		t.Error(err)
+	}
+	err = f00.Vote(101, false)
+	if err != nil {
+		t.Error(err)
 	}
 }
