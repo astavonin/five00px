@@ -8,6 +8,15 @@ import (
 	"testing"
 )
 
+func handleComments(id string) (string, int) {
+	if id == "142795351" {
+		return "comments.json", http.StatusOK
+	} else if id == "42" {
+		return "404.json", http.StatusNotFound
+	}
+	return "", http.StatusNotFound
+}
+
 func handleVotes(id string) (string, int) {
 	if id == "142795351" {
 		return "photo_votes.json", http.StatusOK
@@ -38,17 +47,20 @@ func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 
 	rePhotoById := regexp.MustCompile(`/photos/(\w+)`)
 	rePhotoVotes := regexp.MustCompile(`/photos/(\w+)/votes`)
+	rePhotoComments := regexp.MustCompile(`/photos/(\w+)/comments`)
 
 	if u.Path == "/photos" {
 		return "photos.json", http.StatusOK
 	} else if u.Path == "/photos/search" {
 		return "photos_search.json", http.StatusOK
+	} else if res := rePhotoComments.FindStringSubmatch(u.Path); len(res) > 0 {
+		return handleComments(res[1])
 	} else if res := rePhotoVotes.FindStringSubmatch(u.Path); len(res) > 0 {
 		return handleVotes(res[1])
 	} else if res := rePhotoById.FindStringSubmatch(u.Path); len(res) > 0 {
 		return handleById(res[1])
 	}
-	return "", http.StatusNotFound
+	return "404.json", http.StatusNotFound
 }
 
 func TestCategory(t *testing.T) {
@@ -168,6 +180,27 @@ func TestVotes(t *testing.T) {
 	}
 
 	if v.TotalItems != 12 || len(v.Users) != 12 {
+		t.Error("Unexpected votes")
+	}
+}
+
+func TestComments(t *testing.T) {
+	f00 := NewTest500px()
+
+	_, err := f00.PhotoComments(42, nil)
+	if err != ErrPhotoNotFound {
+		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
+	}
+
+	c, err := f00.PhotoComments(142795351, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c == nil || c.Comments == nil {
+		t.Errorf("Votes: %t, Users: %t", c == nil, c.Comments == nil)
+	}
+
+	if c.TotalItems != 2 || len(c.Comments) != 2 {
 		t.Error("Unexpected votes")
 	}
 }

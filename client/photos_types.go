@@ -7,7 +7,7 @@ type Photo struct {
 	Camera                 string      `json:"camera"`
 	Category               Category    `json:"category"`
 	CollectionsCount       int         `json:"collections_count"`
-	Comments               Comments    `json:"comments"`
+	Comments               []Comment   `json:"comments"`
 	CommentsCount          int         `json:"comments_count"`
 	Converted              interface{} `json:"converted"`
 	ConvertedBits          int         `json:"converted_bits"`
@@ -75,7 +75,13 @@ type Comment struct {
 	Voted        bool   `json:"voted"`
 }
 
-type Comments []Comment
+type Comments struct {
+	MediaType   string    `json:"media_type"`
+	CurrentPage int       `json:"current_page"`
+	TotalItems  int       `json:"total_items"`
+	TotalPages  int       `json:"total_pages"`
+	Comments    []Comment `json:"comments"`
+}
 
 type Votes struct {
 	CurrentPage int    `json:"current_page"`

@@ -121,6 +121,25 @@ func processError(log *logrus.Entry, b []byte) error {
 	return nil
 }
 
+func (f00 *Five00px) PhotoComments(id int, p *Page) (*Comments, error) {
+	log := logrus.WithFields(logrus.Fields{
+		"context": "PhotoComments",
+		"id":      id,
+		"page":    p,
+	})
+
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/comments", http.MethodGet, p.Vals())
+	if err != nil {
+		return nil, processError(log, b)
+	}
+
+	var c Comments
+
+	err = json.Unmarshal(b, &c)
+	log.WithError(err).Info("Done")
+	return &c, err
+}
+
 func (f00 *Five00px) PhotoVotes(id int, p *Page) (*Votes, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "PhotoVotes",
