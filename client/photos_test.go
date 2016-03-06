@@ -2,12 +2,22 @@
 package five00px
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
 	"testing"
 )
+
+func handleVotes(id string) (string, int) {
+	if id == "142795351" {
+		return "photo_votes.json", http.StatusOK
+	} else if id == "42" {
+		return "404.json", http.StatusNotFound
+	} else if id == "100" {
+		return "403.json", http.StatusForbidden
+	}
+	return "", http.StatusNotFound
+}
 
 func handleById(id string) (string, int) {
 	if id == "142795351" {
@@ -27,11 +37,14 @@ func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 	}
 
 	rePhotoById := regexp.MustCompile(`/photos/(\w+)`)
+	rePhotoVotes := regexp.MustCompile(`/photos/(\w+)/votes`)
 
 	if u.Path == "/photos" {
 		return "photos.json", http.StatusOK
 	} else if u.Path == "/photos/search" {
 		return "photos_search.json", http.StatusOK
+	} else if res := rePhotoVotes.FindStringSubmatch(u.Path); len(res) > 0 {
+		return handleVotes(res[1])
 	} else if res := rePhotoById.FindStringSubmatch(u.Path); len(res) > 0 {
 		return handleById(res[1])
 	}
@@ -70,7 +83,6 @@ func TestPhotos(t *testing.T) {
 		t.Error("Unexpected data")
 	}
 
-	fmt.Println("Category:", f.Photos[0].Category)
 	// Unexpected feature
 	s.Feature = "asdfg"
 	f, err = f00.Photos(s, nil)
@@ -123,14 +135,39 @@ func TestPhotoById(t *testing.T) {
 		t.Fatal(err)
 	}
 	if p == nil || p.Comments == nil {
-		t.Error("Photo: %t, Comments: %t", p == nil, p.Comments == nil)
+		t.Errorf("Photo: %t, Comments: %t", p == nil, p.Comments == nil)
 	}
 
-	fmt.Println(p.ID, p.UserID)
 	if p.ID != 142795351 || p.UserID != 8264807 {
 		t.Error("Unexpected Photo")
 	}
 	if len(p.Comments) != 2 || p.CommentsCount != 2 || p.Comments[0].ID != 274841309 {
 		t.Error("Unexpected Comments")
+	}
+}
+
+func TestVotes(t *testing.T) {
+	f00 := NewTest500px()
+
+	_, err := f00.PhotoVotes(42, nil)
+	if err != ErrPhotoNotFound {
+		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
+	}
+
+	_, err = f00.PhotoVotes(100, nil)
+	if err != ErrPhotoNotAvailable {
+		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotAvailable, err)
+	}
+
+	v, err := f00.PhotoVotes(142795351, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v == nil || v.Users == nil {
+		t.Errorf("Votes: %t, Users: %t", v == nil, v.Users == nil)
+	}
+
+	if v.TotalItems != 12 || len(v.Users) != 12 {
+		t.Error("Unexpected votes")
 	}
 }

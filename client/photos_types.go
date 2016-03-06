@@ -3,63 +3,63 @@ package five00px
 
 // Photo is an array of prhotos for selected criterias
 type Photo struct {
-	Aperture               string   `json:"aperture"`
-	Camera                 string   `json:"camera"`
-	Category               Category `json:"category"`
-	CollectionsCount       int      `json:"collections_count"`
-	Comments               Comments `json:"comments"`
-	CommentsCount          int      `json:"comments_count"`
-	Converted              bool     `json:"converted"`
-	ConvertedBits          int      `json:"converted_bits"`
-	CreatedAt              string   `json:"created_at"`
-	CropVersion            int      `json:"crop_version"`
-	Description            string   `json:"description"`
-	Disliked               bool     `json:"disliked"`
-	Favorited              bool     `json:"favorited"`
-	FavoritesCount         int      `json:"favorites_count"`
-	FocalLength            string   `json:"focal_length"`
-	ForSale                bool     `json:"for_sale"`
-	ForSaleDate            string   `json:"for_sale_date"`
-	Height                 int      `json:"height"`
-	HiResUploaded          int      `json:"hi_res_uploaded"`
-	HighestRating          float32  `json:"highest_rating"`
-	HighestRatingDate      string   `json:"highest_rating_date"`
-	ID                     int      `json:"id"`
-	ImageFormat            string   `json:"image_format"`
-	ImageURL               string   `json:"image_url"`
-	Iso                    string   `json:"iso"`
-	Latitude               float32  `json:"latitude"`
-	Lens                   string   `json:"lens"`
-	LicenseRequestsEnabled bool     `json:"license_requests_enabled"`
-	LicenseType            int      `json:"license_type"`
-	LicensingRequested     bool     `json:"licensing_requested"`
-	Liked                  bool     `json:"liked"`
-	Location               string   `json:"location"`
-	Longitude              float32  `json:"longitude"`
-	Name                   string   `json:"name"`
-	Nsfw                   bool     `json:"nsfw"`
-	PositiveVotesCount     int      `json:"positive_votes_count"`
-	Privacy                bool     `json:"privacy"`
-	Profile                bool     `json:"profile"`
-	Purchased              bool     `json:"purchased"`
-	Rating                 float32  `json:"rating"`
-	RequestToBuyEnabled    bool     `json:"request_to_buy_enabled"`
-	SalesCount             int      `json:"sales_count"`
-	ShutterSpeed           string   `json:"shutter_speed"`
-	Status                 int      `json:"status"`
-	StoreDownload          bool     `json:"store_download"`
-	StoreLicense           bool     `json:"store_license"`
-	StorePrint             bool     `json:"store_print"`
-	Tags                   []string `json:"tags"`
-	TakenAt                string   `json:"taken_at"`
-	TimesViewed            int      `json:"times_viewed"`
-	URL                    string   `json:"url"`
-	User                   User     `json:"user"`
-	UserID                 int      `json:"user_id"`
-	Voted                  bool     `json:"voted"`
-	VotesCount             int      `json:"votes_count"`
-	Watermark              bool     `json:"watermark"`
-	Width                  int      `json:"width"`
+	Aperture               string      `json:"aperture"`
+	Camera                 string      `json:"camera"`
+	Category               Category    `json:"category"`
+	CollectionsCount       int         `json:"collections_count"`
+	Comments               Comments    `json:"comments"`
+	CommentsCount          int         `json:"comments_count"`
+	Converted              interface{} `json:"converted"`
+	ConvertedBits          int         `json:"converted_bits"`
+	CreatedAt              string      `json:"created_at"`
+	CropVersion            int         `json:"crop_version"`
+	Description            string      `json:"description"`
+	Disliked               bool        `json:"disliked"`
+	Favorited              bool        `json:"favorited"`
+	FavoritesCount         int         `json:"favorites_count"`
+	FocalLength            string      `json:"focal_length"`
+	ForSale                bool        `json:"for_sale"`
+	ForSaleDate            string      `json:"for_sale_date"`
+	Height                 int         `json:"height"`
+	HiResUploaded          int         `json:"hi_res_uploaded"`
+	HighestRating          float32     `json:"highest_rating"`
+	HighestRatingDate      string      `json:"highest_rating_date"`
+	ID                     int         `json:"id"`
+	ImageFormat            string      `json:"image_format"`
+	ImageURL               string      `json:"image_url"`
+	Iso                    string      `json:"iso"`
+	Latitude               float32     `json:"latitude"`
+	Lens                   string      `json:"lens"`
+	LicenseRequestsEnabled bool        `json:"license_requests_enabled"`
+	LicenseType            int         `json:"license_type"`
+	LicensingRequested     bool        `json:"licensing_requested"`
+	Liked                  bool        `json:"liked"`
+	Location               string      `json:"location"`
+	Longitude              float32     `json:"longitude"`
+	Name                   string      `json:"name"`
+	Nsfw                   bool        `json:"nsfw"`
+	PositiveVotesCount     int         `json:"positive_votes_count"`
+	Privacy                bool        `json:"privacy"`
+	Profile                bool        `json:"profile"`
+	Purchased              bool        `json:"purchased"`
+	Rating                 float32     `json:"rating"`
+	RequestToBuyEnabled    bool        `json:"request_to_buy_enabled"`
+	SalesCount             int         `json:"sales_count"`
+	ShutterSpeed           string      `json:"shutter_speed"`
+	Status                 int         `json:"status"`
+	StoreDownload          bool        `json:"store_download"`
+	StoreLicense           bool        `json:"store_license"`
+	StorePrint             bool        `json:"store_print"`
+	Tags                   []string    `json:"tags"`
+	TakenAt                string      `json:"taken_at"`
+	TimesViewed            int         `json:"times_viewed"`
+	URL                    string      `json:"url"`
+	User                   User        `json:"user"`
+	UserID                 int         `json:"user_id"`
+	Voted                  bool        `json:"voted"`
+	VotesCount             int         `json:"votes_count"`
+	Watermark              bool        `json:"watermark"`
+	Width                  int         `json:"width"`
 }
 
 type Comment struct {
@@ -76,6 +76,13 @@ type Comment struct {
 }
 
 type Comments []Comment
+
+type Votes struct {
+	CurrentPage int    `json:"current_page"`
+	TotalItems  int    `json:"total_items"`
+	TotalPages  int    `json:"total_pages"`
+	Users       []User `json:"users"`
+}
 
 // Filters NOTE: Category and Exclude are interfaces as they could be false or int values
 type Filters struct {
