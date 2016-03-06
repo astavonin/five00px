@@ -18,6 +18,12 @@ var ErrUserNotFriend = errors.New("The user requested has been disabled or not i
 // ErrInvalidInput ...
 var ErrInvalidInput = errors.New("Invalid user input")
 
+// ErrPhotoNotFound ...
+var ErrPhotoNotFound = errors.New("Photo with the specified ID does not exist")
+
+// ErrPhotoNotAvailable
+var ErrPhotoNotAvailable = errors.New("The photo was either deleted, belongs to a deactivated user")
+
 type five00Error struct {
 	Error  string `json:"error"`
 	Status int    `json:"status"`

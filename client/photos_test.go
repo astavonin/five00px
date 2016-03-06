@@ -5,8 +5,20 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"testing"
 )
+
+func handleById(id string) (string, int) {
+	if id == "142795351" {
+		return "photo.json", http.StatusOK
+	} else if id == "42" {
+		return "404.json", http.StatusNotFound
+	} else if id == "100" {
+		return "403.json", http.StatusForbidden
+	}
+	return "", http.StatusNotFound
+}
 
 func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 	u, err := url.Parse(r.URL.String())
@@ -14,12 +26,16 @@ func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 		return "", http.StatusInternalServerError
 	}
 
+	rePhotoById := regexp.MustCompile(`/photos/(\w+)`)
+
 	if u.Path == "/photos" {
 		return "photos.json", http.StatusOK
 	} else if u.Path == "/photos/search" {
 		return "photos_search.json", http.StatusOK
+	} else if res := rePhotoById.FindStringSubmatch(u.Path); len(res) > 0 {
+		return handleById(res[1])
 	}
-	return "", http.StatusInternalServerError
+	return "", http.StatusNotFound
 }
 
 func TestCategory(t *testing.T) {
@@ -85,5 +101,36 @@ func TestPhotosSearch(t *testing.T) {
 	if p.CurrentPage != 1 || p.TotalItems != 84 || p.TotalPages != 28 ||
 		len(p.Photos) != 3 {
 		t.Error("Unexpected data")
+	}
+}
+
+func TestPhotoById(t *testing.T) {
+	f00 := NewTest500px()
+
+	_, err := f00.PhotoById(42, nil)
+	if err != ErrPhotoNotFound {
+		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
+	}
+
+	_, err = f00.PhotoById(100, nil)
+	if err != ErrPhotoNotAvailable {
+		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotAvailable, err)
+	}
+
+	info := PhotoInfo{Comments: true}
+	p, err := f00.PhotoById(142795351, &info)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p == nil || p.Comments == nil {
+		t.Error("Photo: %t, Comments: %t", p == nil, p.Comments == nil)
+	}
+
+	fmt.Println(p.ID, p.UserID)
+	if p.ID != 142795351 || p.UserID != 8264807 {
+		t.Error("Unexpected Photo")
+	}
+	if len(p.Comments) != 2 || p.CommentsCount != 2 || p.Comments[0].ID != 274841309 {
+		t.Error("Unexpected Comments")
 	}
 }

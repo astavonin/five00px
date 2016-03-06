@@ -328,3 +328,26 @@ func (l License) Valid() bool {
 func (l License) String() string {
 	return strconv.Itoa(int(l))
 }
+
+type PhotoInfo struct {
+	ImageSize    Size
+	Comments     bool
+	CommentsPage int
+}
+
+func (p *PhotoInfo) Vals() url.Values {
+	vals := url.Values{}
+	if p != nil {
+		if p.ImageSize.Valid() {
+			vals.Add("image_size", p.ImageSize.String())
+		}
+		if p.Comments != false {
+			vals.Add("comments", "1")
+		}
+		if p.CommentsPage != 0 {
+			vals.Add("comments_page", strconv.Itoa(p.CommentsPage))
+		}
+	}
+	vals.Add("tags", "1")
+	return vals
+}

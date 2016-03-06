@@ -7,8 +7,9 @@ type Photo struct {
 	Camera                 string   `json:"camera"`
 	Category               Category `json:"category"`
 	CollectionsCount       int      `json:"collections_count"`
+	Comments               Comments `json:"comments"`
 	CommentsCount          int      `json:"comments_count"`
-	Converted              int      `json:"converted"`
+	Converted              bool     `json:"converted"`
 	ConvertedBits          int      `json:"converted_bits"`
 	CreatedAt              string   `json:"created_at"`
 	CropVersion            int      `json:"crop_version"`
@@ -61,7 +62,22 @@ type Photo struct {
 	Width                  int      `json:"width"`
 }
 
-// Filters NOTE: Category and Exclude are interfaces as they are false or int values
+type Comment struct {
+	Body         string `json:"body"`
+	CreatedAt    string `json:"created_at"`
+	Flagged      bool   `json:"flagged"`
+	ID           int    `json:"id"`
+	ParentID     int    `json:"parent_id"`
+	Rating       int    `json:"rating"`
+	ToWhomUserID int    `json:"to_whom_user_id"`
+	User         User   `json:"user"`
+	UserID       int    `json:"user_id"`
+	Voted        bool   `json:"voted"`
+}
+
+type Comments []Comment
+
+// Filters NOTE: Category and Exclude are interfaces as they could be false or int values
 type Filters struct {
 	Category interface{} `json:"category"`
 	Exclude  interface{} `json:"exclude"`
