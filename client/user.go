@@ -143,21 +143,10 @@ func (f00 *Five00px) AddFriend(id int) (*User, error) {
 		http.MethodPost, nil)
 
 	if err != nil {
-		var e00 five00Error
-		err = json.Unmarshal(b, &e00)
-		if err != nil {
-			log.WithError(err).WithField("data", string(b)).
-				Error("Unable to unmarshall data")
-			return nil, ErrInternal
-		}
-		log.WithField("status", strconv.Itoa(e00.Status)).
-			Info("server returns error")
-		switch e00.Status {
-		case http.StatusNotFound:
-			return nil, ErrUserNotFound
-		case http.StatusForbidden:
-			return nil, ErrUserAlreadyFriend
-		}
+		return nil, processError(log, b, ErrorTable{
+			http.StatusNotFound:  ErrUserNotFound,
+			http.StatusForbidden: ErrUserAlreadyFriend,
+		})
 	}
 
 	var f User
@@ -178,21 +167,10 @@ func (f00 *Five00px) DelFriend(id int) (*User, error) {
 		http.MethodDelete, nil)
 
 	if err != nil {
-		var e00 five00Error
-		err = json.Unmarshal(b, &e00)
-		if err != nil {
-			log.WithError(err).WithField("buffer", string(b)).
-				Error("Unable to unmarshall data")
-			return nil, ErrInternal
-		}
-		log.WithField("status", strconv.Itoa(e00.Status)).
-			Info("server returns error")
-		switch e00.Status {
-		case http.StatusNotFound:
-			return nil, ErrUserNotFound
-		case http.StatusForbidden:
-			return nil, ErrUserNotFriend
-		}
+		return nil, processError(log, b, ErrorTable{
+			http.StatusNotFound:  ErrUserNotFound,
+			http.StatusForbidden: ErrUserNotFriend,
+		})
 	}
 
 	var f User

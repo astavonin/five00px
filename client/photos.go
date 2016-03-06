@@ -173,15 +173,37 @@ func (f00 *Five00px) Vote(id int, like bool) error {
 	})
 
 	method := http.MethodPost
+	vals := url.Values{}
 	if !like {
 		method = http.MethodDelete
+	} else {
+		vals.Add("vote", "1")
 	}
-	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/vote", method, url.Values{})
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/vote", method, vals)
 	if err != nil {
 		return processError(log, b, ErrorTable{
 			http.StatusNotFound:   ErrPhotoNotFound,
 			http.StatusForbidden:  ErrVoteRejected,
 			http.StatusBadRequest: ErrInvalidInput,
+		})
+	}
+
+	return nil
+}
+
+func (f00 *Five00px) AddComment(id int, comment string) error {
+	log := logrus.WithFields(logrus.Fields{
+		"context": "AddComment",
+		"id":      id,
+		"comment": comment,
+	})
+
+	vals := url.Values{"body": {comment}}
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/commens", http.MethodPost, vals)
+	if err != nil {
+		return processError(log, b, ErrorTable{
+			http.StatusNotFound:   ErrPhotoNotFound,
+			http.StatusBadRequest: ErrBadComment,
 		})
 	}
 

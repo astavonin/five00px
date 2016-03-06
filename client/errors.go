@@ -28,6 +28,8 @@ var ErrVoteRejected = errors.New("The vote has been rejected; common reasons are
 	" current user is inactive, has not completed their profile, is trying to vote" +
 	" on their own photo, or has already voted for the photo")
 
+var ErrBadComment = errors.New("The body of the comment was not specified")
+
 type five00Error struct {
 	Error  string `json:"error"`
 	Status int    `json:"status"`
