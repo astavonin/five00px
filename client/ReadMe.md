@@ -2,7 +2,6 @@
 #Unsupported commands:
 
 GET photos/:id/comments
-GET photos/:id/votes
 PUT photos/:id
 POST photos
 POST photos/upload
