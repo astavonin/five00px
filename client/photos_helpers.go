@@ -101,20 +101,7 @@ func (s Size) Valid() bool {
 		Size70x70,
 		Size140x140,
 		Size280x280,
-		Size100x100,
-		Size200x200,
-		Size440x440,
-		Size600x600,
-		Size900l,
-		Size1170l,
-		Size1080h,
-		Size300h,
-		Size600h,
-		Size256l,
-		Size450h,
-		Size1080l,
-		Size1600l,
-		Size2048l:
+		Size900l:
 		return true
 	}
 	return false
