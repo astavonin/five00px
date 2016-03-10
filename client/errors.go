@@ -30,6 +30,8 @@ var ErrVoteRejected = errors.New("The vote has been rejected; common reasons are
 
 var ErrBadComment = errors.New("The body of the comment was not specified")
 
+var ErrUnprocessableEntity = errors.New("The system had trouble saving the record. You may retry again.")
+
 type five00Error struct {
 	Error  string `json:"error"`
 	Status int    `json:"status"`

@@ -2,6 +2,8 @@
 package five00px
 
 import (
+	"fmt"
+	"io"
 	"net/url"
 	"strconv"
 	"strings"
@@ -336,5 +338,70 @@ func (p *PhotoInfo) Vals() url.Values {
 		}
 	}
 	vals.Add("tags", "1")
+	return vals
+}
+
+type UploadInfo struct {
+	Photo        io.Reader
+	Aperture     string
+	Camera       string
+	Category     Category
+	Description  string
+	FocalLength  string
+	Iso          string
+	Latitude     float32
+	Lens         string
+	Longitude    float32
+	Name         string
+	Privacy      bool
+	ShutterSpeed string
+	Tags         []string
+}
+
+func (i *UploadInfo) Valid() bool {
+	return i.Photo != nil && i.Name != "" && i.Description != "" && i.Category.Valid()
+}
+
+func (i *UploadInfo) Vals() url.Values {
+	vals := url.Values{}
+
+	if i != nil && i.Valid() {
+		vals.Add("name", i.Name)
+		vals.Add("description", i.Description)
+		vals.Add("category", strconv.Itoa(int(i.Category)))
+		if i.ShutterSpeed != "" {
+			vals.Add("shutter_speed", i.ShutterSpeed)
+		}
+		if i.FocalLength != "" {
+			vals.Add("focal_length", i.FocalLength)
+		}
+		if i.Aperture != "" {
+			vals.Add("aperture", i.Aperture)
+		}
+		if i.Iso != "" {
+			vals.Add("iso", i.Iso)
+		}
+		if i.Camera != "" {
+			vals.Add("camera", i.Camera)
+		}
+		if i.Lens != "" {
+			vals.Add("lens", i.Lens)
+		}
+		if i.Latitude != 0 {
+			vals.Add("latitude", fmt.Sprintf("%.13f", i.Latitude))
+		}
+		if i.Longitude != 0 {
+			vals.Add("longitude", fmt.Sprintf("%.13f", i.Longitude))
+		}
+		if len(i.Tags) > 0 {
+			vals.Add("tags", strings.Join(i.Tags, ","))
+		}
+		if i.Privacy {
+			vals.Add("privacy", "1")
+		} else {
+			vals.Add("privacy", "0")
+		}
+	}
+
 	return vals
 }

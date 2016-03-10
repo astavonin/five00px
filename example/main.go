@@ -71,49 +71,68 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fr, err := f00.Friends(9091479, &five00px.Page{1, 1})
 
-	for _, u := range fr.Users {
-		fmt.Println(u.Avatars.Default)
-	}
-	u, err := f00.UserByID(9091479)
+	f, err := os.Open("../client/test_data/test_img.jpg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(u.City)
+	defer f.Close()
 
-	fl, err := f00.Followers(9091479, nil)
+	var upInfo = five00px.UploadInfo{
+		Category:    five00px.CategoryBW,
+		Description: "test description",
+		Name:        "test name",
+		Photo:       f,
+	}
+	photo, err := f00.Upload(upInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(fl.FollowersCount)
+	fmt.Println(photo)
 
-	u, err = f00.AddFriend(42)
-	fmt.Println(err)
+	//fr, err := f00.Friends(9091479, &five00px.Page{1, 1})
 
-	u, err = f00.DelFriend(42)
-	fmt.Println(err)
+	//for _, u := range fr.Users {
+	//fmt.Println(u.Avatars.Default)
+	//}
+	//u, err := f00.UserByID(9091479)
+	//if err != nil {
+	//log.Fatal(err)
+	//}
+	//fmt.Println(u.City)
 
-	s := five00px.StreamCriterias{
-		Feature: five00px.FeaturePopular,
-	}
-	p := five00px.Page{
-		Rpp: 3,
-	}
-	photos, err := f00.Photos(s, &p)
-	fmt.Println("", len(photos.Photos), photos.TotalPages, photos.TotalItems)
+	//fl, err := f00.Followers(9091479, nil)
+	//if err != nil {
+	//log.Fatal(err)
+	//}
+	//fmt.Println(fl.FollowersCount)
 
-	sCrit := five00px.SearchCriterias{
-		Term:        "test",
-		Tag:         "best",
-		LicenseType: five00px.LicAll,
-	}
+	//u, err = f00.AddFriend(42)
+	//fmt.Println(err)
 
-	photos, err = f00.PhotosSearch(sCrit, &p)
+	//u, err = f00.DelFriend(42)
+	//fmt.Println(err)
 
-	if err != nil || photos.CurrentPage != 1 || photos.TotalItems != 84 ||
-		photos.TotalPages != 28 || len(photos.Photos) != 3 {
-		log.Fatal(err)
-	}
+	//s := five00px.StreamCriterias{
+	//Feature: five00px.FeaturePopular,
+	//}
+	//p := five00px.Page{
+	//Rpp: 3,
+	//}
+	//photos, err := f00.Photos(s, &p)
+	//fmt.Println("", len(photos.Photos), photos.TotalPages, photos.TotalItems)
+
+	//sCrit := five00px.SearchCriterias{
+	//Term:        "test",
+	//Tag:         "best",
+	//LicenseType: five00px.LicAll,
+	//}
+
+	//photos, err = f00.PhotosSearch(sCrit, &p)
+
+	//if err != nil || photos.CurrentPage != 1 || photos.TotalItems != 84 ||
+	//photos.TotalPages != 28 || len(photos.Photos) != 3 {
+	//log.Fatal(err)
+	//}
 
 }

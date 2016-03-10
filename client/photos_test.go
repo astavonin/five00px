@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -63,8 +64,10 @@ func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 	rePhotoVotes := regexp.MustCompile(`/photos/(\w+)/votes`)
 	rePhotoComments := regexp.MustCompile(`/photos/(\w+)/comments`)
 
-	if u.Path == "/photos" {
+	if u.Path == "/photos" && r.Method == http.MethodGet {
 		return "photos.json", http.StatusOK
+	} else if u.Path == "/photos" && r.Method == http.MethodPost {
+		return "upload.json", http.StatusOK
 	} else if u.Path == "/photos/search" {
 		return "photos_search.json", http.StatusOK
 	} else if res := rePhotoComments.FindStringSubmatch(u.Path); len(res) > 0 {
@@ -242,4 +245,28 @@ func TestVote(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+}
+
+func TestUpload(t *testing.T) {
+	f00 := NewTest500px()
+	info := UploadInfo{}
+
+	if info.Valid() {
+		t.Error("Expecting invalid")
+	}
+
+	info.Name = "test name"
+	info.Description = "test description"
+	info.Category = CategoryBW
+	info.Photo = strings.NewReader("")
+	info.Tags = []string{"tag1", "tag2", "tag N"}
+	if !info.Valid() {
+		t.Error("Should be valid here")
+	}
+
+	err := f00.Upload(info)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 }

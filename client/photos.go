@@ -118,7 +118,11 @@ func processError(log *logrus.Entry, b []byte, errTbl ErrorTable) error {
 	}
 	log.WithField("status", strconv.Itoa(e00.Status)).
 		Info("server returns error")
-	return errTbl[e00.Status]
+	ret := errTbl[e00.Status]
+	if ret == nil {
+		return ErrInternal
+	}
+	return ret
 }
 
 func (f00 *Five00px) PhotoComments(id int, p *Page) (*Comments, error) {
@@ -208,4 +212,37 @@ func (f00 *Five00px) AddComment(id int, comment string) error {
 	}
 
 	return nil
+}
+
+func (f00 *Five00px) Upload(info UploadInfo) (*Photo, error) {
+	log := logrus.WithFields(logrus.Fields{
+		"context": "Upload",
+		"info":    info,
+	})
+
+	if !info.Valid() {
+		log.Error("Invalid input")
+		return nil, ErrInvalidInput
+	}
+	b, err := doUpload(f00.c, "photos/upload", info.Photo, info.Vals())
+	if err != nil {
+		return nil, processError(log, b, ErrorTable{
+			422: ErrUnprocessableEntity,
+		})
+	}
+
+	var objmap map[string]*json.RawMessage
+	err = json.Unmarshal(b, &objmap)
+
+	if err != nil {
+		log.WithError(err).WithField("data", string(b)).
+			Error("Unable to unmarshall data")
+		return nil, err
+	}
+
+	var photo Photo
+
+	err = json.Unmarshal(*objmap["photo"], &photo)
+	log.WithError(err).Info("Done")
+	return &photo, err
 }

@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+var uploadAPIUrl = "http://upload.500px.com/v1/upload"
 var mainAPIUrl = "https://api.500px.com/v1/"
 
 // ValsConverter converts type to url.Values

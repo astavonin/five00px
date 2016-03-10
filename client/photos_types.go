@@ -106,6 +106,11 @@ type Photos struct {
 	TotalPages  int     `json:"total_pages"`
 }
 
+type UploadResp struct {
+	UploadKey string `json:"upload_key"`
+	Photo     Photo  `json:"photo"`
+}
+
 // Category helper type
 type Category int
 

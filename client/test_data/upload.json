@@ -1,0 +1,98 @@
+{
+  "upload_key": "c38540acbfaa93a187b88c7884b2bf26",
+  "photo": {
+    "id": 143372093,
+    "user_id": 9091479,
+    "name": "test name",
+    "description": "test description",
+    "camera": null,
+    "lens": null,
+    "focal_length": null,
+    "iso": null,
+    "shutter_speed": null,
+    "aperture": null,
+    "times_viewed": 0,
+    "rating": 0,
+    "status": 0,
+    "created_at": "2016-03-07T08:07:38-05:00",
+    "category": 1,
+    "location": null,
+    "latitude": null,
+    "longitude": null,
+    "taken_at": null,
+    "hi_res_uploaded": 0,
+    "for_sale": false,
+    "width": null,
+    "height": null,
+    "votes_count": 0,
+    "favorites_count": 0,
+    "comments_count": 0,
+    "nsfw": false,
+    "sales_count": 0,
+    "for_sale_date": null,
+    "highest_rating": 0,
+    "highest_rating_date": null,
+    "license_type": 0,
+    "converted": false,
+    "collections_count": 0,
+    "crop_version": 0,
+    "image_format": "jpeg",
+    "positive_votes_count": 0,
+    "privacy": true,
+    "profile": false,
+    "url": "/photo/143372093/test-name-by-alexander-stavonin",
+    "image_url": "https://drscdn.500px.org/photo/143372093/m%3D900_k%3D1_a%3D1/7942adedf890caf127747e3fd0559bba",
+    "images": [
+      {
+        "size": 4,
+        "url": "https://drscdn.500px.org/photo/143372093/m%3D900_k%3D1_a%3D1/7942adedf890caf127747e3fd0559bba",
+        "https_url": "https://drscdn.500px.org/photo/143372093/m%3D900_k%3D1_a%3D1/7942adedf890caf127747e3fd0559bba",
+        "format": "jpeg"
+      }
+    ],
+    "store_download": false,
+    "store_print": false,
+    "store_license": false,
+    "request_to_buy_enabled": true,
+    "license_requests_enabled": false,
+    "converted_bits": 0,
+    "editors_choice": false,
+    "editors_choice_date": null,
+    "share_counts": {},
+    "editored_by": {},
+    "user": {
+      "id": 9091479,
+      "username": "alexanderstavonin",
+      "firstname": "Alexander",
+      "lastname": "Stavonin",
+      "city": "Singapore",
+      "country": "Singapore",
+      "usertype": 0,
+      "fullname": "Alexander Stavonin",
+      "userpic_url": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/1.jpg?2",
+      "userpic_https_url": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/1.jpg?2",
+      "cover_url": null,
+      "upgrade_status": 0,
+      "store_on": false,
+      "affection": 626,
+      "followers_count": 16,
+      "avatars": {
+        "default": {
+          "https": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/1.jpg?2"
+        },
+        "large": {
+          "https": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/2.jpg?2"
+        },
+        "small": {
+          "https": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/3.jpg?2"
+        },
+        "tiny": {
+          "https": "https://pacdn.500px.org/9091479/e7df1ddbb95e8fd6d18399daf3f237bd79ae0e32/4.jpg?2"
+        }
+      }
+    },
+    "comments": [],
+    "watermark": false,
+    "licensing_requested": false
+  }
+}

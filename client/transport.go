@@ -4,7 +4,9 @@ package five00px
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"sort"
@@ -46,20 +48,54 @@ func buildQuery(v url.Values) string {
 	return buf.String()
 }
 
-func doCommand(c *http.Client, dstPoint, method string, vals url.Values) ([]byte, error) {
+func doUpload(c *http.Client, dstPoint string, f io.Reader, vals url.Values) ([]byte, error) {
 
+	dstPoint += buildQuery(vals)
+	log := logrus.WithFields(logrus.Fields{
+		"context": "doUpload",
+		"path":    dstPoint,
+	})
+
+	var b bytes.Buffer
+	w := multipart.NewWriter(&b)
+
+	fw, err := w.CreateFormFile("file", "upload.jpg")
+	if err != nil {
+		log.WithError(err).Error("Cannot create Writer")
+		return nil, err
+	}
+	if _, err = io.Copy(fw, f); err != nil {
+		log.WithError(err).Error("Cannot read file")
+		return nil, err
+	}
+
+	w.Close()
+
+	return do(c, mainAPIUrl+dstPoint, http.MethodPost, w.FormDataContentType(), &b, log)
+}
+
+func doCommand(c *http.Client, dstPoint, method string, vals url.Values) ([]byte, error) {
 	dstPoint += buildQuery(vals)
 
 	log := logrus.WithFields(logrus.Fields{
 		"context": "HTTP " + method,
-		"host":    mainAPIUrl,
 		"path":    dstPoint,
 		"values":  vals,
 	})
 
+	return do(c, mainAPIUrl+dstPoint, method, "", nil, log)
+}
+
+func do(c *http.Client, url, method, ctype string, body io.Reader, log *logrus.Entry) ([]byte, error) {
+
+	log = log.WithField("host", mainAPIUrl)
 	log.Info("Initiating request")
 
-	req, err := http.NewRequest(method, mainAPIUrl+dstPoint, nil)
+	req, err := http.NewRequest(method, url, body)
+	if ctype != "" {
+		req.Header.Set("Content-Type", ctype)
+	}
+
 	r, err := c.Do(req)
 	defer func() {
 		_ = r.Body.Close()
