@@ -39,7 +39,7 @@ func handleVotes(id string) (string, int) {
 	} else if id == "100" {
 		return "403.json", http.StatusForbidden
 	}
-	return "", http.StatusNotFound
+	return "404.json", http.StatusNotFound
 }
 
 func handleById(id string) (string, int) {
@@ -50,7 +50,26 @@ func handleById(id string) (string, int) {
 	} else if id == "100" {
 		return "403.json", http.StatusForbidden
 	}
-	return "", http.StatusNotFound
+	return "404.json", http.StatusNotFound
+}
+
+func handleUpload(r *http.Request) (string, int) {
+	if !strings.Contains(r.Header["Content-Type"][0], "multipart/form-data") {
+		return "400.json", http.StatusUnsupportedMediaType
+	}
+
+	return "upload.json", http.StatusOK
+}
+
+func handleDelete(id string) (string, int) {
+
+	if id == "100" {
+		return "404.json", http.StatusNotFound
+	} else if id == "42" {
+		return "403.json", http.StatusForbidden
+	} else {
+		return "photo_del.json", http.StatusOK
+	}
 }
 
 func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
@@ -70,14 +89,20 @@ func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 		return "upload.json", http.StatusOK
 	} else if u.Path == "/photos/search" {
 		return "photos_search.json", http.StatusOK
+	} else if u.Path == "/photos/upload" && r.Method == http.MethodPost {
+		return handleUpload(r)
 	} else if res := rePhotoComments.FindStringSubmatch(u.Path); len(res) > 0 {
 		return handleComments(res[1])
 	} else if res := rePhotoVote.FindStringSubmatch(u.Path); len(res) > 0 {
 		return handleVote(res[1], r.Method)
 	} else if res := rePhotoVotes.FindStringSubmatch(u.Path); len(res) > 0 {
 		return handleVotes(res[1])
-	} else if res := rePhotoById.FindStringSubmatch(u.Path); len(res) > 0 {
+	} else if res := rePhotoById.FindStringSubmatch(u.Path); len(res) > 0 &&
+		r.Method == http.MethodGet {
 		return handleById(res[1])
+	} else if res := rePhotoById.FindStringSubmatch(u.Path); len(res) > 0 &&
+		r.Method == http.MethodDelete {
+		return handleDelete(res[1])
 	}
 	return "404.json", http.StatusNotFound
 }
@@ -264,9 +289,30 @@ func TestUpload(t *testing.T) {
 		t.Error("Should be valid here")
 	}
 
-	err := f00.Upload(info)
+	photo, err := f00.Upload(info)
 	if err != nil {
 		t.Fatal(err)
 	}
+	if photo.ID != 143807905 && photo.UserID != 9091479 {
+		t.Error("Invalid response")
+	}
+}
 
+func TestDelete(t *testing.T) {
+	f00 := NewTest500px()
+
+	err := f00.PhotoDelete(100) // not exists
+	if err != ErrPhotoNotFound {
+		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
+	}
+
+	err = f00.PhotoDelete(42) // not belong to the current user
+	if err != ErrPhotoNotAvailable {
+		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotAvailable, err)
+	}
+
+	//err = f00.PhotoDelete(101) // success
+	//if err != nil {
+	//t.Error(err)
+	//}
 }

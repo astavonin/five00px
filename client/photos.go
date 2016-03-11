@@ -90,20 +90,10 @@ func (f00 *Five00px) PhotoById(id int, info *PhotoInfo) (*Photo, error) {
 		})
 	}
 
-	var objmap map[string]*json.RawMessage
-	err = json.Unmarshal(b, &objmap)
-
-	if err != nil {
-		log.WithError(err).WithField("data", string(b)).
-			Error("Unable to unmarshall data")
-		return nil, err
-	}
-
-	var photo Photo
-
-	err = json.Unmarshal(*objmap["photo"], &photo)
+	photo, err := extractPhoto(b, log)
 	log.WithError(err).Info("Done")
-	return &photo, err
+
+	return photo, err
 }
 
 type ErrorTable map[int]error
@@ -115,6 +105,9 @@ func processError(log *logrus.Entry, b []byte, errTbl ErrorTable) error {
 		log.WithError(err).WithField("data", string(b)).
 			Error("Unable to unmarshall data")
 		return ErrInternal
+	}
+	if e00.Status == 200 {
+		return nil
 	}
 	log.WithField("status", strconv.Itoa(e00.Status)).
 		Info("server returns error")
@@ -214,6 +207,23 @@ func (f00 *Five00px) AddComment(id int, comment string) error {
 	return nil
 }
 
+func extractPhoto(buf []byte, log *logrus.Entry) (*Photo, error) {
+	var objmap map[string]*json.RawMessage
+	err := json.Unmarshal(buf, &objmap)
+
+	if err != nil {
+		log.WithError(err).WithField("data", string(buf)).
+			Error("Unable to unmarshall data")
+		return nil, err
+	}
+
+	var photo Photo
+
+	err = json.Unmarshal(*objmap["photo"], &photo)
+
+	return &photo, err
+}
+
 func (f00 *Five00px) Upload(info UploadInfo) (*Photo, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Upload",
@@ -231,18 +241,26 @@ func (f00 *Five00px) Upload(info UploadInfo) (*Photo, error) {
 		})
 	}
 
-	var objmap map[string]*json.RawMessage
-	err = json.Unmarshal(b, &objmap)
+	photo, err := extractPhoto(b, log)
+	log.WithError(err).Info("Done")
+
+	return photo, err
+}
+func (f00 *Five00px) PhotoDelete(id int) error {
+	log := logrus.WithFields(logrus.Fields{
+		"context": "PhotoDelete",
+		"id":      id,
+	})
+
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id),
+		http.MethodDelete, nil)
 
 	if err != nil {
-		log.WithError(err).WithField("data", string(b)).
-			Error("Unable to unmarshall data")
-		return nil, err
+		return processError(log, b, ErrorTable{
+			http.StatusNotFound:  ErrPhotoNotFound,
+			http.StatusForbidden: ErrPhotoNotAvailable,
+		})
 	}
 
-	var photo Photo
-
-	err = json.Unmarshal(*objmap["photo"], &photo)
-	log.WithError(err).Info("Done")
-	return &photo, err
+	return nil
 }
