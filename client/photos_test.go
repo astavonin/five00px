@@ -130,7 +130,7 @@ func TestPhotos(t *testing.T) {
 		Feature: FeaturePopular,
 	}
 
-	f, err := f00.Photos(s, nil)
+	f, err := f00.ListPhotos(s, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -141,7 +141,7 @@ func TestPhotos(t *testing.T) {
 
 	// Unexpected feature
 	s.Feature = "asdfg"
-	f, err = f00.Photos(s, nil)
+	f, err = f00.ListPhotos(s, nil)
 	if err != ErrInvalidInput {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrInvalidInput, err)
 	}
@@ -161,7 +161,7 @@ func TestPhotosSearch(t *testing.T) {
 		t.Errorf("Expecting:\t%s\nFound:\t%s", cExp, cRes)
 	}
 
-	p, err := f00.PhotosSearch(c, nil)
+	p, err := f00.SearchPhoto(c, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -175,18 +175,18 @@ func TestPhotosSearch(t *testing.T) {
 func TestPhotoById(t *testing.T) {
 	f00 := NewTest500px()
 
-	_, err := f00.PhotoById(42, nil)
+	_, err := f00.GetPhotoById(42, nil)
 	if err != ErrPhotoNotFound {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
 	}
 
-	_, err = f00.PhotoById(100, nil)
+	_, err = f00.GetPhotoById(100, nil)
 	if err != ErrPhotoNotAvailable {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotAvailable, err)
 	}
 
 	info := PhotoInfo{Comments: true}
-	p, err := f00.PhotoById(142795351, &info)
+	p, err := f00.GetPhotoById(142795351, &info)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,17 +205,17 @@ func TestPhotoById(t *testing.T) {
 func TestVotes(t *testing.T) {
 	f00 := NewTest500px()
 
-	_, err := f00.PhotoVotes(42, nil)
+	_, err := f00.ListVotes(42, nil)
 	if err != ErrPhotoNotFound {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
 	}
 
-	_, err = f00.PhotoVotes(100, nil)
+	_, err = f00.ListVotes(100, nil)
 	if err != ErrPhotoNotAvailable {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotAvailable, err)
 	}
 
-	v, err := f00.PhotoVotes(142795351, nil)
+	v, err := f00.ListVotes(142795351, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -231,12 +231,12 @@ func TestVotes(t *testing.T) {
 func TestComments(t *testing.T) {
 	f00 := NewTest500px()
 
-	_, err := f00.PhotoComments(42, nil)
+	_, err := f00.ListComments(42, nil)
 	if err != ErrPhotoNotFound {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
 	}
 
-	c, err := f00.PhotoComments(142795351, nil)
+	c, err := f00.ListComments(142795351, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -252,21 +252,21 @@ func TestComments(t *testing.T) {
 func TestVote(t *testing.T) {
 	f00 := NewTest500px()
 
-	err := f00.Vote(42, true)
+	err := f00.AddVote(42, true)
 	if err != ErrPhotoNotFound {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
 	}
 
-	err = f00.Vote(100, true)
+	err = f00.AddVote(100, true)
 	if err != ErrVoteRejected {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrVoteRejected, err)
 	}
 
-	err = f00.Vote(101, true)
+	err = f00.AddVote(101, true)
 	if err != nil {
 		t.Error(err)
 	}
-	err = f00.Vote(101, false)
+	err = f00.AddVote(101, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -289,7 +289,7 @@ func TestUpload(t *testing.T) {
 		t.Error("Should be valid here")
 	}
 
-	photo, err := f00.Upload(info)
+	photo, err := f00.AddPhoto(info)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -301,12 +301,12 @@ func TestUpload(t *testing.T) {
 func TestDelete(t *testing.T) {
 	f00 := NewTest500px()
 
-	err := f00.PhotoDelete(100) // not exists
+	err := f00.DelPhoto(100) // not exists
 	if err != ErrPhotoNotFound {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
 	}
 
-	err = f00.PhotoDelete(42) // not belong to the current user
+	err = f00.DelPhoto(42) // not belong to the current user
 	if err != ErrPhotoNotAvailable {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotAvailable, err)
 	}

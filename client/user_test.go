@@ -97,7 +97,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 func TestGetUserByName_Fail(t *testing.T) {
 	f00 := NewTest500px()
 
-	_, err := f00.UserByName("bad_name")
+	_, err := f00.GetUserByName("bad_name")
 	if err == nil {
 		t.Fatal("It's fail case")
 	}
@@ -106,7 +106,7 @@ func TestGetUserByName_Fail(t *testing.T) {
 func TestGetUserByEmail(t *testing.T) {
 	f00 := NewTest500px()
 
-	u, err := f00.UserByEmail("alex@sysdev.me")
+	u, err := f00.GetUserByEmail("alex@sysdev.me")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +118,7 @@ func TestGetUserByEmail(t *testing.T) {
 func TestGetUserByName(t *testing.T) {
 	f00 := NewTest500px()
 
-	u, err := f00.UserByName("alexanderstavonin")
+	u, err := f00.GetUserByName("alexanderstavonin")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,14 +130,14 @@ func TestGetUserByName(t *testing.T) {
 func TestGetUserByID(t *testing.T) {
 	f00 := NewTest500px()
 
-	u, err := f00.UserByID(0)
+	u, err := f00.GetUserByID(0)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if u.Username != "alexanderstavonin" || u.ID != 9091479 {
 		t.Fatal("Invalid user data")
 	}
-	_, err = f00.UserByID(9091479)
+	_, err = f00.GetUserByID(9091479)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,7 +147,7 @@ func TestFriends(t *testing.T) {
 	f00 := NewTest500px()
 
 	page := NewPage()
-	u, err := f00.Friends(9091479, &page)
+	u, err := f00.ListFriends(9091479, &page)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -160,7 +160,7 @@ func TestFollowers(t *testing.T) {
 	f00 := NewTest500px()
 
 	page := NewPage()
-	u, err := f00.Followers(9091479, &page)
+	u, err := f00.ListFollowers(9091479, &page)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -173,7 +173,7 @@ func TestPhotoSearch(t *testing.T) {
 	f00 := NewTest500px()
 
 	page := NewPage()
-	s, err := f00.UserSearch("@@@", &page) // will not find
+	s, err := f00.SearchUser("@@@", &page) // will not find
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -184,7 +184,7 @@ func TestPhotoSearch(t *testing.T) {
 	// ----
 
 	page.Rpp = 19
-	s, err = f00.UserSearch("empty", &page)
+	s, err = f00.SearchUser("empty", &page)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -40,7 +40,7 @@ func userBy(c *http.Client, dstPoint string, vals url.Values) (*User, error) {
 
 // UserByID call returns User struct for a user specified by id. If id == 0
 // returns the profile information for the current user.
-func (f00 *Five00px) UserByID(id int) (*User, error) {
+func (f00 *Five00px) GetUserByID(id int) (*User, error) {
 	dstPoint := "users"
 	vals := url.Values{}
 	if id != 0 {
@@ -52,19 +52,19 @@ func (f00 *Five00px) UserByID(id int) (*User, error) {
 }
 
 // UserByName returns User struct for a user specified by name.
-func (f00 *Five00px) UserByName(name string) (*User, error) {
+func (f00 *Five00px) GetUserByName(name string) (*User, error) {
 
 	return userBy(f00.c, "users/show", url.Values{"username": {name}})
 }
 
 // UserByEmail returns User struct for a user specified by email.
-func (f00 *Five00px) UserByEmail(email string) (*User, error) {
+func (f00 *Five00px) GetUserByEmail(email string) (*User, error) {
 
 	return userBy(f00.c, "users/show", url.Values{"email": {email}})
 }
 
 // Friends call returns list of friends for a user specified by ID.
-func (f00 *Five00px) Friends(id int, p *Page) (*Friends, error) {
+func (f00 *Five00px) ListFriends(id int, p *Page) (*Friends, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Friends",
 		"id":      id,
@@ -86,8 +86,8 @@ func (f00 *Five00px) Friends(id int, p *Page) (*Friends, error) {
 	return &f, err
 }
 
-// Followers call returns list of followers for a user specified by ID.
-func (f00 *Five00px) Followers(id int, p *Page) (*Followers, error) {
+// ListFollowers call returns list of followers for a user specified by ID.
+func (f00 *Five00px) ListFollowers(id int, p *Page) (*Followers, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Followers",
 		"id":      id,
@@ -110,7 +110,7 @@ func (f00 *Five00px) Followers(id int, p *Page) (*Followers, error) {
 
 // UserSearch call returns list of users (up to one hundred) users from search
 // results for a specified search term
-func (f00 *Five00px) UserSearch(term string, p *Page) (*Search, error) {
+func (f00 *Five00px) SearchUser(term string, p *Page) (*Search, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Search",
 		"term":    term,

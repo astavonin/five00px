@@ -84,7 +84,7 @@ func main() {
 		Name:        "test name",
 		Photo:       f,
 	}
-	photo, err := f00.Upload(upInfo)
+	photo, err := f00.AddPhoto(upInfo)
 	if err != nil {
 		log.Fatal(err)
 	}

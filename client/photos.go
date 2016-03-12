@@ -15,7 +15,7 @@ import (
 //}
 
 // Photos call returns a list of photos for specified phot stream
-func (f00 *Five00px) Photos(c StreamCriterias, p *Page) (*Photos, error) {
+func (f00 *Five00px) ListPhotos(c StreamCriterias, p *Page) (*Photos, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context":   "Photos",
 		"criterias": c,
@@ -45,7 +45,7 @@ func (f00 *Five00px) Photos(c StreamCriterias, p *Page) (*Photos, error) {
 }
 
 // PhotosSearch searches for specific photos
-func (f00 *Five00px) PhotosSearch(c SearchCriterias, p *Page) (*Photos, error) {
+func (f00 *Five00px) SearchPhoto(c SearchCriterias, p *Page) (*Photos, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context":   "PhotosSearch",
 		"criterias": c,
@@ -74,7 +74,7 @@ func (f00 *Five00px) PhotosSearch(c SearchCriterias, p *Page) (*Photos, error) {
 	return &photos, err
 }
 
-func (f00 *Five00px) PhotoById(id int, info *PhotoInfo) (*Photo, error) {
+func (f00 *Five00px) GetPhotoById(id int, info *PhotoInfo) (*Photo, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "PhotoById",
 		"id":      id,
@@ -118,7 +118,7 @@ func processError(log *logrus.Entry, b []byte, errTbl ErrorTable) error {
 	return ret
 }
 
-func (f00 *Five00px) PhotoComments(id int, p *Page) (*Comments, error) {
+func (f00 *Five00px) ListComments(id int, p *Page) (*Comments, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "PhotoComments",
 		"id":      id,
@@ -140,7 +140,7 @@ func (f00 *Five00px) PhotoComments(id int, p *Page) (*Comments, error) {
 	return &c, err
 }
 
-func (f00 *Five00px) PhotoVotes(id int, p *Page) (*Votes, error) {
+func (f00 *Five00px) ListVotes(id int, p *Page) (*Votes, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "PhotoVotes",
 		"id":      id,
@@ -162,7 +162,7 @@ func (f00 *Five00px) PhotoVotes(id int, p *Page) (*Votes, error) {
 	return &votes, err
 }
 
-func (f00 *Five00px) Vote(id int, like bool) error {
+func (f00 *Five00px) AddVote(id int, like bool) error {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Vote",
 		"id":      id,
@@ -224,7 +224,7 @@ func extractPhoto(buf []byte, log *logrus.Entry) (*Photo, error) {
 	return &photo, err
 }
 
-func (f00 *Five00px) Upload(info UploadInfo) (*Photo, error) {
+func (f00 *Five00px) AddPhoto(info UploadInfo) (*Photo, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Upload",
 		"info":    info,
@@ -246,7 +246,7 @@ func (f00 *Five00px) Upload(info UploadInfo) (*Photo, error) {
 
 	return photo, err
 }
-func (f00 *Five00px) PhotoDelete(id int) error {
+func (f00 *Five00px) DelPhoto(id int) error {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "PhotoDelete",
 		"id":      id,
