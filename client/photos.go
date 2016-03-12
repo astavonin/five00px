@@ -241,7 +241,7 @@ func (f00 *Five00px) AddPhoto(info UploadInfo) (*Photo, error) {
 		log.Error("Invalid input")
 		return nil, ErrInvalidInput
 	}
-	b, err := doUpload(f00.c, "photos/upload", info.Photo, info.Vals())
+	b, err := doUpload(f00.c, "photos/upload", info.FileName, info.PhotoStream, info.Vals())
 	if err != nil {
 		return nil, processError(log, b, errorTable{
 			422: ErrUnprocessableEntity,

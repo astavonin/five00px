@@ -351,7 +351,8 @@ func (p *PhotoInfo) Vals() url.Values {
 
 // UploadInfo contains values for new photo uploading
 type UploadInfo struct {
-	Photo        io.Reader
+	FileName     string
+	PhotoStream  io.Reader
 	Aperture     string
 	Camera       string
 	Category     Category
@@ -369,7 +370,7 @@ type UploadInfo struct {
 
 // Valid uf UploadInfo contains acceptable values
 func (i *UploadInfo) Valid() bool {
-	return i.Photo != nil && i.Name != "" && i.Description != "" && i.Category.Valid()
+	return i.PhotoStream != nil && i.Name != "" && i.Description != "" && i.Category.Valid()
 }
 
 // Vals representation for UploadInfo

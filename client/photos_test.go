@@ -283,7 +283,7 @@ func TestUpload(t *testing.T) {
 	info.Name = "test name"
 	info.Description = "test description"
 	info.Category = CategoryBW
-	info.Photo = strings.NewReader("")
+	info.PhotoStream = strings.NewReader("")
 	info.Tags = []string{"tag1", "tag2", "tag N"}
 	if !info.Valid() {
 		t.Error("Should be valid here")

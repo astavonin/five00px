@@ -48,7 +48,7 @@ func buildQuery(v url.Values) string {
 	return buf.String()
 }
 
-func doUpload(c *http.Client, dstPoint string, f io.Reader, vals url.Values) ([]byte, error) {
+func doUpload(c *http.Client, dstPoint, fName string, f io.Reader, vals url.Values) ([]byte, error) {
 
 	dstPoint += buildQuery(vals)
 	log := logrus.WithFields(logrus.Fields{
@@ -59,7 +59,7 @@ func doUpload(c *http.Client, dstPoint string, f io.Reader, vals url.Values) ([]
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
 
-	fw, err := w.CreateFormFile("file", "upload.jpg")
+	fw, err := w.CreateFormFile("file", fName)
 	if err != nil {
 		log.WithError(err).Error("Cannot create Writer")
 		return nil, err

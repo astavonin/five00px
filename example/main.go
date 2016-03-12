@@ -82,7 +82,7 @@ func main() {
 		Category:    five00px.CategoryBW,
 		Description: "test description",
 		Name:        "test name",
-		Photo:       f,
+		PhotoStream: f,
 	}
 	photo, err := f00.AddPhoto(upInfo)
 	if err != nil {
