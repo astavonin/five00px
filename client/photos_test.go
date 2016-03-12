@@ -42,7 +42,7 @@ func handleVotes(id string) (string, int) {
 	return "404.json", http.StatusNotFound
 }
 
-func handleById(id string) (string, int) {
+func handleByID(id string) (string, int) {
 	if id == "142795351" {
 		return "photo.json", http.StatusOK
 	} else if id == "42" {
@@ -78,7 +78,7 @@ func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 		return "", http.StatusInternalServerError
 	}
 
-	rePhotoById := regexp.MustCompile(`/photos/(\w+)$`)
+	rePhotoByID := regexp.MustCompile(`/photos/(\w+)$`)
 	rePhotoVote := regexp.MustCompile(`/photos/(\w+)/vote$`)
 	rePhotoVotes := regexp.MustCompile(`/photos/(\w+)/votes`)
 	rePhotoComments := regexp.MustCompile(`/photos/(\w+)/comments`)
@@ -97,10 +97,10 @@ func photosHandler(w http.ResponseWriter, r *http.Request) (string, int) {
 		return handleVote(res[1], r.Method)
 	} else if res := rePhotoVotes.FindStringSubmatch(u.Path); len(res) > 0 {
 		return handleVotes(res[1])
-	} else if res := rePhotoById.FindStringSubmatch(u.Path); len(res) > 0 &&
+	} else if res := rePhotoByID.FindStringSubmatch(u.Path); len(res) > 0 &&
 		r.Method == http.MethodGet {
-		return handleById(res[1])
-	} else if res := rePhotoById.FindStringSubmatch(u.Path); len(res) > 0 &&
+		return handleByID(res[1])
+	} else if res := rePhotoByID.FindStringSubmatch(u.Path); len(res) > 0 &&
 		r.Method == http.MethodDelete {
 		return handleDelete(res[1])
 	}
@@ -175,18 +175,18 @@ func TestPhotosSearch(t *testing.T) {
 func TestPhotoById(t *testing.T) {
 	f00 := NewTest500px()
 
-	_, err := f00.GetPhotoById(42, nil)
+	_, err := f00.GetPhotoByID(42, nil)
 	if err != ErrPhotoNotFound {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotFound, err)
 	}
 
-	_, err = f00.GetPhotoById(100, nil)
+	_, err = f00.GetPhotoByID(100, nil)
 	if err != ErrPhotoNotAvailable {
 		t.Errorf("Expecting \"%s\" but found \"%s\"", ErrPhotoNotAvailable, err)
 	}
 
 	info := PhotoInfo{Comments: true}
-	p, err := f00.GetPhotoById(142795351, &info)
+	p, err := f00.GetPhotoByID(142795351, &info)
 	if err != nil {
 		t.Fatal(err)
 	}

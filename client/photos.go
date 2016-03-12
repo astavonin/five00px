@@ -14,7 +14,7 @@ import (
 //return nil, ErrInvalidInput
 //}
 
-// Photos call returns a list of photos for specified phot stream
+// ListPhotos call returns a list of photos for specified phot stream
 func (f00 *Five00px) ListPhotos(c StreamCriterias, p *Page) (*Photos, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context":   "Photos",
@@ -44,7 +44,7 @@ func (f00 *Five00px) ListPhotos(c StreamCriterias, p *Page) (*Photos, error) {
 	return &photos, err
 }
 
-// PhotosSearch searches for specific photos
+// SearchPhoto searches for specific photos
 func (f00 *Five00px) SearchPhoto(c SearchCriterias, p *Page) (*Photos, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context":   "PhotosSearch",
@@ -74,7 +74,8 @@ func (f00 *Five00px) SearchPhoto(c SearchCriterias, p *Page) (*Photos, error) {
 	return &photos, err
 }
 
-func (f00 *Five00px) GetPhotoById(id int, info *PhotoInfo) (*Photo, error) {
+// GetPhotoByID returns photo by its ID. info may contains additional photo criterias
+func (f00 *Five00px) GetPhotoByID(id int, info *PhotoInfo) (*Photo, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "PhotoById",
 		"id":      id,
@@ -84,7 +85,7 @@ func (f00 *Five00px) GetPhotoById(id int, info *PhotoInfo) (*Photo, error) {
 	vals := info.Vals()
 	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id), http.MethodGet, vals)
 	if err != nil {
-		return nil, processError(log, b, ErrorTable{
+		return nil, processError(log, b, errorTable{
 			http.StatusNotFound:  ErrPhotoNotFound,
 			http.StatusForbidden: ErrPhotoNotAvailable,
 		})
@@ -96,9 +97,9 @@ func (f00 *Five00px) GetPhotoById(id int, info *PhotoInfo) (*Photo, error) {
 	return photo, err
 }
 
-type ErrorTable map[int]error
+type errorTable map[int]error
 
-func processError(log *logrus.Entry, b []byte, errTbl ErrorTable) error {
+func processError(log *logrus.Entry, b []byte, errTbl errorTable) error {
 	var e00 five00Error
 	err := json.Unmarshal(b, &e00)
 	if err != nil {
@@ -118,6 +119,7 @@ func processError(log *logrus.Entry, b []byte, errTbl ErrorTable) error {
 	return ret
 }
 
+// ListComments call returns cammonts for selected photo.
 func (f00 *Five00px) ListComments(id int, p *Page) (*Comments, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "PhotoComments",
@@ -127,7 +129,7 @@ func (f00 *Five00px) ListComments(id int, p *Page) (*Comments, error) {
 
 	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/comments", http.MethodGet, p.Vals())
 	if err != nil {
-		return nil, processError(log, b, ErrorTable{
+		return nil, processError(log, b, errorTable{
 			http.StatusNotFound:  ErrPhotoNotFound,
 			http.StatusForbidden: ErrPhotoNotAvailable,
 		})
@@ -140,6 +142,7 @@ func (f00 *Five00px) ListComments(id int, p *Page) (*Comments, error) {
 	return &c, err
 }
 
+// ListVotes call returns votes fpr selected photo.
 func (f00 *Five00px) ListVotes(id int, p *Page) (*Votes, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "PhotoVotes",
@@ -149,7 +152,7 @@ func (f00 *Five00px) ListVotes(id int, p *Page) (*Votes, error) {
 
 	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/votes", http.MethodGet, p.Vals())
 	if err != nil {
-		return nil, processError(log, b, ErrorTable{
+		return nil, processError(log, b, errorTable{
 			http.StatusNotFound:  ErrPhotoNotFound,
 			http.StatusForbidden: ErrPhotoNotAvailable,
 		})
@@ -162,6 +165,7 @@ func (f00 *Five00px) ListVotes(id int, p *Page) (*Votes, error) {
 	return &votes, err
 }
 
+// AddVote adds/removes vote from selected photo
 func (f00 *Five00px) AddVote(id int, like bool) error {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Vote",
@@ -178,7 +182,7 @@ func (f00 *Five00px) AddVote(id int, like bool) error {
 	}
 	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/vote", method, vals)
 	if err != nil {
-		return processError(log, b, ErrorTable{
+		return processError(log, b, errorTable{
 			http.StatusNotFound:   ErrPhotoNotFound,
 			http.StatusForbidden:  ErrVoteRejected,
 			http.StatusBadRequest: ErrInvalidInput,
@@ -188,6 +192,7 @@ func (f00 *Five00px) AddVote(id int, like bool) error {
 	return nil
 }
 
+// AddComment call adds new comment to selected photo
 func (f00 *Five00px) AddComment(id int, comment string) error {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "AddComment",
@@ -198,7 +203,7 @@ func (f00 *Five00px) AddComment(id int, comment string) error {
 	vals := url.Values{"body": {comment}}
 	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/commens", http.MethodPost, vals)
 	if err != nil {
-		return processError(log, b, ErrorTable{
+		return processError(log, b, errorTable{
 			http.StatusNotFound:   ErrPhotoNotFound,
 			http.StatusBadRequest: ErrBadComment,
 		})
@@ -224,6 +229,8 @@ func extractPhoto(buf []byte, log *logrus.Entry) (*Photo, error) {
 	return &photo, err
 }
 
+// AddPhoto call uploads new photo. Information about uploaded photo or
+// upload error will be returned
 func (f00 *Five00px) AddPhoto(info UploadInfo) (*Photo, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Upload",
@@ -236,7 +243,7 @@ func (f00 *Five00px) AddPhoto(info UploadInfo) (*Photo, error) {
 	}
 	b, err := doUpload(f00.c, "photos/upload", info.Photo, info.Vals())
 	if err != nil {
-		return nil, processError(log, b, ErrorTable{
+		return nil, processError(log, b, errorTable{
 			422: ErrUnprocessableEntity,
 		})
 	}
@@ -246,6 +253,8 @@ func (f00 *Five00px) AddPhoto(info UploadInfo) (*Photo, error) {
 
 	return photo, err
 }
+
+// DelPhoto removes photo by id
 func (f00 *Five00px) DelPhoto(id int) error {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "PhotoDelete",
@@ -256,7 +265,7 @@ func (f00 *Five00px) DelPhoto(id int) error {
 		http.MethodDelete, nil)
 
 	if err != nil {
-		return processError(log, b, ErrorTable{
+		return processError(log, b, errorTable{
 			http.StatusNotFound:  ErrPhotoNotFound,
 			http.StatusForbidden: ErrPhotoNotAvailable,
 		})

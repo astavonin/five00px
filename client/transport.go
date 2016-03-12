@@ -69,7 +69,7 @@ func doUpload(c *http.Client, dstPoint string, f io.Reader, vals url.Values) ([]
 		return nil, err
 	}
 
-	w.Close()
+	_ = w.Close()
 
 	return do(c, mainAPIUrl+dstPoint, http.MethodPost, w.FormDataContentType(), &b, log)
 }

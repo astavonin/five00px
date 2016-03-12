@@ -1,7 +1,7 @@
 // Package five00px provides ...
 package five00px
 
-// Photo is an array of prhotos for selected criterias
+// Photo is an array of photos for selected criterias
 type Photo struct {
 	Aperture               string      `json:"aperture"`
 	Camera                 string      `json:"camera"`
@@ -62,6 +62,7 @@ type Photo struct {
 	Width                  int         `json:"width"`
 }
 
+// Comment representation
 type Comment struct {
 	Body         string `json:"body"`
 	CreatedAt    string `json:"created_at"`
@@ -75,6 +76,7 @@ type Comment struct {
 	Voted        bool   `json:"voted"`
 }
 
+// Comments contains list of comments
 type Comments struct {
 	MediaType   string    `json:"media_type"`
 	CurrentPage int       `json:"current_page"`
@@ -83,6 +85,7 @@ type Comments struct {
 	Comments    []Comment `json:"comments"`
 }
 
+// Votes contains list of voted Users
 type Votes struct {
 	CurrentPage int    `json:"current_page"`
 	TotalItems  int    `json:"total_items"`
@@ -104,11 +107,6 @@ type Photos struct {
 	Photos      []Photo `json:"photos"`
 	TotalItems  int     `json:"total_items"`
 	TotalPages  int     `json:"total_pages"`
-}
-
-type UploadResp struct {
-	UploadKey string `json:"upload_key"`
-	Photo     Photo  `json:"photo"`
 }
 
 // Category helper type

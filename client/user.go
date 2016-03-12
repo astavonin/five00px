@@ -38,7 +38,7 @@ func userBy(c *http.Client, dstPoint string, vals url.Values) (*User, error) {
 	return &u, err
 }
 
-// UserByID call returns User struct for a user specified by id. If id == 0
+// GetUserByID call returns User struct for a user specified by id. If id == 0
 // returns the profile information for the current user.
 func (f00 *Five00px) GetUserByID(id int) (*User, error) {
 	dstPoint := "users"
@@ -51,19 +51,19 @@ func (f00 *Five00px) GetUserByID(id int) (*User, error) {
 	return userBy(f00.c, dstPoint, vals)
 }
 
-// UserByName returns User struct for a user specified by name.
+// GetUserByName returns User struct for a user specified by name.
 func (f00 *Five00px) GetUserByName(name string) (*User, error) {
 
 	return userBy(f00.c, "users/show", url.Values{"username": {name}})
 }
 
-// UserByEmail returns User struct for a user specified by email.
+// GetUserByEmail returns User struct for a user specified by email.
 func (f00 *Five00px) GetUserByEmail(email string) (*User, error) {
 
 	return userBy(f00.c, "users/show", url.Values{"email": {email}})
 }
 
-// Friends call returns list of friends for a user specified by ID.
+// ListFriends call returns list of friends for a user specified by ID.
 func (f00 *Five00px) ListFriends(id int, p *Page) (*Friends, error) {
 	log := logrus.WithFields(logrus.Fields{
 		"context": "Friends",
@@ -108,7 +108,7 @@ func (f00 *Five00px) ListFollowers(id int, p *Page) (*Followers, error) {
 	return &f, err
 }
 
-// UserSearch call returns list of users (up to one hundred) users from search
+// SearchUser call returns list of users (up to one hundred) users from search
 // results for a specified search term
 func (f00 *Five00px) SearchUser(term string, p *Page) (*Search, error) {
 	log := logrus.WithFields(logrus.Fields{
@@ -143,7 +143,7 @@ func (f00 *Five00px) AddFriend(id int) (*User, error) {
 		http.MethodPost, nil)
 
 	if err != nil {
-		return nil, processError(log, b, ErrorTable{
+		return nil, processError(log, b, errorTable{
 			http.StatusNotFound:  ErrUserNotFound,
 			http.StatusForbidden: ErrUserAlreadyFriend,
 		})
@@ -167,7 +167,7 @@ func (f00 *Five00px) DelFriend(id int) (*User, error) {
 		http.MethodDelete, nil)
 
 	if err != nil {
-		return nil, processError(log, b, ErrorTable{
+		return nil, processError(log, b, errorTable{
 			http.StatusNotFound:  ErrUserNotFound,
 			http.StatusForbidden: ErrUserNotFriend,
 		})

@@ -18,7 +18,7 @@ type Validator interface {
 
 // PhotoCriterias section
 
-// PhotoCriterias ...
+// StreamCriterias structure is used for photo stream selection
 type StreamCriterias struct {
 	Feature       Feature
 	Only          Categories
@@ -33,7 +33,8 @@ func (p *StreamCriterias) Valid() bool {
 	return p.Feature.Valid()
 }
 
-func NewPhotoCriterias() *StreamCriterias {
+// NewStreamCriterias is helper function for predefining StreamCriterias values
+func NewStreamCriterias() *StreamCriterias {
 	return &StreamCriterias{
 		Feature: FeaturePopular,
 	}
@@ -229,16 +230,19 @@ type SearchCriterias struct {
 	Sort        SortBy
 }
 
+// NewSearchCriterias is helper function for predefining vlaues for SearchCriterias
 func NewSearchCriterias() *SearchCriterias {
 	return &SearchCriterias{
 		LicenseType: LicAll,
 	}
 }
 
+// Valid if SearchCriterias contains acceptable values
 func (s *SearchCriterias) Valid() bool {
 	return s.Term != "" || s.Tag != ""
 }
 
+// Vals converts SearchCriterias to url.Values
 func (s *SearchCriterias) Vals() url.Values {
 	vals := url.Values{}
 	if s != nil {
@@ -295,6 +299,7 @@ func (g Geo) Valid() bool {
 	return g.Units.Valid()
 }
 
+// String representation for distance units
 func (g Geo) String() string {
 	return g.Latitude + "," + g.Longitude + "," + g.Radius + "<" + g.Units.String() + ">"
 }
@@ -314,16 +319,19 @@ func (l License) Valid() bool {
 	return false
 }
 
+// String representation for license
 func (l License) String() string {
 	return strconv.Itoa(int(l))
 }
 
+// PhotoInfo is used for providing extra information about photo
 type PhotoInfo struct {
 	ImageSize    Size
 	Comments     bool
 	CommentsPage int
 }
 
+// Vals representation for PhotoInfo
 func (p *PhotoInfo) Vals() url.Values {
 	vals := url.Values{}
 	if p != nil {
@@ -341,6 +349,7 @@ func (p *PhotoInfo) Vals() url.Values {
 	return vals
 }
 
+// UploadInfo contains values for new photo uploading
 type UploadInfo struct {
 	Photo        io.Reader
 	Aperture     string
@@ -358,10 +367,12 @@ type UploadInfo struct {
 	Tags         []string
 }
 
+// Valid uf UploadInfo contains acceptable values
 func (i *UploadInfo) Valid() bool {
 	return i.Photo != nil && i.Name != "" && i.Description != "" && i.Category.Valid()
 }
 
+// Vals representation for UploadInfo
 func (i *UploadInfo) Vals() url.Values {
 	vals := url.Values{}
 
