@@ -16,7 +16,7 @@ func userBy(c *http.Client, dstPoint string, vals url.Values) (*User, error) {
 		"lookup_method": vals,
 	})
 
-	b, err := doCommand(c, dstPoint, http.MethodGet, vals)
+	b, err := doCommand(c, dstPoint, http.MethodGet, vals, nil)
 	if err != nil {
 		log.WithError(err).Warn("Failed to GET data")
 		return nil, ErrUserNotFound
@@ -72,7 +72,7 @@ func (f00 *Five00px) ListFriends(id int, p *Page) (*Friends, error) {
 	})
 
 	b, err := doCommand(f00.c, "users/"+strconv.Itoa(id)+"/friends", http.MethodGet,
-		p.Vals())
+		p.Vals(), nil)
 
 	if err != nil {
 		log.WithError(err).Warn("Failed to GET data")
@@ -94,7 +94,7 @@ func (f00 *Five00px) ListFollowers(id int, p *Page) (*Followers, error) {
 		"page":    p,
 	})
 	b, err := doCommand(f00.c, "users/"+strconv.Itoa(id)+"/followers",
-		http.MethodGet, p.Vals())
+		http.MethodGet, p.Vals(), nil)
 
 	if err != nil {
 		log.WithError(err).Warn("Failed to GET data")
@@ -118,7 +118,7 @@ func (f00 *Five00px) SearchUser(term string, p *Page) (*Search, error) {
 	})
 	v := p.Vals()
 	v.Add("term", term)
-	b, err := doCommand(f00.c, "users/search", http.MethodGet, v)
+	b, err := doCommand(f00.c, "users/search", http.MethodGet, v, nil)
 
 	if err != nil {
 		log.WithError(err).Warn("Failed to GET data")
@@ -140,7 +140,7 @@ func (f00 *Five00px) AddFriend(id int) (*User, error) {
 		"id":      id,
 	})
 	b, err := doCommand(f00.c, "users/"+strconv.Itoa(id)+"/friends",
-		http.MethodPost, nil)
+		http.MethodPost, nil, nil)
 
 	if err != nil {
 		return nil, processError(log, b, errorTable{
@@ -164,7 +164,7 @@ func (f00 *Five00px) DelFriend(id int) (*User, error) {
 	})
 
 	b, err := doCommand(f00.c, "users/"+strconv.Itoa(id)+"/friends",
-		http.MethodDelete, nil)
+		http.MethodDelete, nil, nil)
 
 	if err != nil {
 		return nil, processError(log, b, errorTable{

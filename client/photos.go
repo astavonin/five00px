@@ -10,10 +10,6 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-//func doPhotosReq(c *http.Client, mathod, context string, vals url.Values) (*Photos, error) {
-//return nil, ErrInvalidInput
-//}
-
 // ListPhotos call returns a list of photos for specified phot stream
 func (f00 *Five00px) ListPhotos(c StreamCriterias, p *Page) (*Photos, error) {
 	log := logger.WithFields(logrus.Fields{
@@ -31,7 +27,7 @@ func (f00 *Five00px) ListPhotos(c StreamCriterias, p *Page) (*Photos, error) {
 	for k, v := range p.Vals() {
 		vals[k] = v
 	}
-	b, err := doCommand(f00.c, "photos", http.MethodGet, vals)
+	b, err := doCommand(f00.c, "photos", http.MethodGet, vals, nil)
 	if err != nil {
 		log.WithError(err).Error("Failed to get data")
 		return nil, ErrInternal
@@ -61,7 +57,7 @@ func (f00 *Five00px) SearchPhoto(c SearchCriterias, p *Page) (*Photos, error) {
 	for k, v := range p.Vals() {
 		vals[k] = v
 	}
-	b, err := doCommand(f00.c, "photos/search", http.MethodGet, vals)
+	b, err := doCommand(f00.c, "photos/search", http.MethodGet, vals, nil)
 	if err != nil {
 		log.WithError(err).Error("Failed to get data")
 		return nil, ErrInternal
@@ -83,7 +79,7 @@ func (f00 *Five00px) GetPhotoByID(id int, info *PhotoInfo) (*Photo, error) {
 	})
 
 	vals := info.Vals()
-	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id), http.MethodGet, vals)
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id), http.MethodGet, vals, nil)
 	if err != nil {
 		return nil, processError(log, b, errorTable{
 			http.StatusNotFound:  ErrPhotoNotFound,
@@ -127,7 +123,7 @@ func (f00 *Five00px) ListComments(id int, p *Page) (*Comments, error) {
 		"page":    p,
 	})
 
-	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/comments", http.MethodGet, p.Vals())
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/comments", http.MethodGet, p.Vals(), nil)
 	if err != nil {
 		return nil, processError(log, b, errorTable{
 			http.StatusNotFound:  ErrPhotoNotFound,
@@ -150,7 +146,7 @@ func (f00 *Five00px) ListVotes(id int, p *Page) (*Votes, error) {
 		"page":    p,
 	})
 
-	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/votes", http.MethodGet, p.Vals())
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/votes", http.MethodGet, p.Vals(), nil)
 	if err != nil {
 		return nil, processError(log, b, errorTable{
 			http.StatusNotFound:  ErrPhotoNotFound,
@@ -180,7 +176,7 @@ func (f00 *Five00px) AddVote(id int, like bool) error {
 	} else {
 		vals.Add("vote", "1")
 	}
-	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/vote", method, vals)
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/vote", method, vals, nil)
 	if err != nil {
 		return processError(log, b, errorTable{
 			http.StatusNotFound:   ErrPhotoNotFound,
@@ -200,10 +196,10 @@ func (f00 *Five00px) AddComment(id int, comment string) error {
 		"comment": comment,
 	})
 
-	vals := url.Values{"body": {comment}}
-	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/commens", http.MethodPost, vals)
+	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id)+"/comments", http.MethodPost,
+		nil, url.Values{"body": {comment}})
 	if err != nil {
-		return processError(log, b, errorTable{
+		return processError(log.WithError(err), b, errorTable{
 			http.StatusNotFound:   ErrPhotoNotFound,
 			http.StatusBadRequest: ErrBadComment,
 		})
@@ -262,7 +258,7 @@ func (f00 *Five00px) DelPhoto(id int) error {
 	})
 
 	b, err := doCommand(f00.c, "photos/"+strconv.Itoa(id),
-		http.MethodDelete, nil)
+		http.MethodDelete, nil, nil)
 
 	if err != nil {
 		return processError(log, b, errorTable{

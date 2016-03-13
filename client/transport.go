@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
+	"strings"
 
 	"github.com/Sirupsen/logrus"
 )
@@ -74,7 +75,7 @@ func doUpload(c *http.Client, dstPoint, fName string, f io.Reader, vals url.Valu
 	return do(c, mainAPIUrl+dstPoint, http.MethodPost, w.FormDataContentType(), &b, log)
 }
 
-func doCommand(c *http.Client, dstPoint, method string, vals url.Values) ([]byte, error) {
+func doCommand(c *http.Client, dstPoint, method string, vals url.Values, body url.Values) ([]byte, error) {
 	dstPoint += buildQuery(vals)
 
 	log := logger.WithFields(logrus.Fields{
@@ -83,7 +84,16 @@ func doCommand(c *http.Client, dstPoint, method string, vals url.Values) ([]byte
 		"values":  vals,
 	})
 
-	return do(c, mainAPIUrl+dstPoint, method, "", nil, log)
+	var (
+		b     io.Reader = nil
+		ctype           = ""
+	)
+	if body != nil {
+		ctype = "application/x-www-form-urlencoded"
+		b = strings.NewReader(body.Encode())
+	}
+
+	return do(c, mainAPIUrl+dstPoint, method, ctype, b, log)
 }
 
 func do(c *http.Client, url, method, ctype string, body io.Reader, log *logrus.Entry) ([]byte, error) {
@@ -95,7 +105,6 @@ func do(c *http.Client, url, method, ctype string, body io.Reader, log *logrus.E
 	if ctype != "" {
 		req.Header.Set("Content-Type", ctype)
 	}
-
 	r, err := c.Do(req)
 	defer func() {
 		_ = r.Body.Close()
