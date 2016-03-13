@@ -4,3 +4,5 @@ conf.json
 .idea
 *.swo
 coverage.out
+*.jpg
+*.bak
