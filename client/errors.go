@@ -35,6 +35,8 @@ var ErrBadComment = errors.New("The body of the comment was not specified")
 // ErrUnprocessableEntity ...
 var ErrUnprocessableEntity = errors.New("The system had trouble saving the record. You may retry again.")
 
+var ErrAuth = errors.New("Authentication error")
+
 type five00Error struct {
 	Error  string `json:"error"`
 	Status int    `json:"status"`

@@ -3,12 +3,12 @@ package five00px
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/mrjones/oauth"
 	"github.com/toqueteos/webbrowser"
 )
@@ -29,21 +29,28 @@ type authResp struct {
 }
 
 func (oa *oAuth) Auth() (*AccessToken, error) {
+
+	log := logrus.WithFields(logrus.Fields{
+		"context": "Auth",
+	})
 	reqToken, u, err := oa.c.GetRequestTokenAndUrl(fmt.Sprint("http://127.0.0.1:", oa.Port))
 	if err != nil {
-		log.Panicln(err)
+		log.WithError(err).Error("Unable to create OAuth provider")
+		return nil, ErrAuth
 	}
 
 	l, err := net.Listen("tcp", fmt.Sprint(":", oa.Port))
 	if err != nil {
-		log.Panicln(err)
+		log.WithError(err).Error("Cannot start TCP service")
+		return nil, ErrAuth
 	}
 	c := make(chan authResp)
 	go serveOAuthResp(l, &c)
 
 	err = webbrowser.Open(u)
 	if err != nil {
-		log.Panicln(err)
+		log.WithError(err).Error("Cannot start browser")
+		return nil, ErrAuth
 	}
 
 	auth := <-c
@@ -51,9 +58,14 @@ func (oa *oAuth) Auth() (*AccessToken, error) {
 	_ = l.Close()
 
 	if auth.err != nil {
+		log.WithError(auth.err).Error("Authentication error")
 		return nil, auth.err
 	}
 	accessToken, err := oa.c.AuthorizeToken(reqToken, auth.verifier)
+	if err != nil {
+		log.WithError(err).Error("Unable to authorize token")
+		return nil, err
+	}
 
 	token := AccessToken(*accessToken)
 	return &token, nil
@@ -103,8 +115,12 @@ func parseAccessToken(urlQuery string) (oauthToken string, oauthVerifier string,
 	if err != nil {
 		return "", "", err
 	}
-	oauthToken = val["oauth_token"][0]
-	oauthVerifier = val["oauth_verifier"][0]
+	tokens := val["oauth_token"]
+	verifiers := val["oauth_verifier"]
+	if tokens != nil && verifiers != nil {
+		oauthToken = tokens[0]
+		oauthVerifier = verifiers[0]
+	}
 
 	return oauthToken, oauthVerifier, nil
 }
