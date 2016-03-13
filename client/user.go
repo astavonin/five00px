@@ -11,7 +11,7 @@ import (
 )
 
 func userBy(c *http.Client, dstPoint string, vals url.Values) (*User, error) {
-	log := logrus.WithFields(logrus.Fields{
+	log := logger.WithFields(logrus.Fields{
 		"context":       "userBy",
 		"lookup_method": vals,
 	})
@@ -65,7 +65,7 @@ func (f00 *Five00px) GetUserByEmail(email string) (*User, error) {
 
 // ListFriends call returns list of friends for a user specified by ID.
 func (f00 *Five00px) ListFriends(id int, p *Page) (*Friends, error) {
-	log := logrus.WithFields(logrus.Fields{
+	log := logger.WithFields(logrus.Fields{
 		"context": "Friends",
 		"id":      id,
 		"page":    p,
@@ -88,7 +88,7 @@ func (f00 *Five00px) ListFriends(id int, p *Page) (*Friends, error) {
 
 // ListFollowers call returns list of followers for a user specified by ID.
 func (f00 *Five00px) ListFollowers(id int, p *Page) (*Followers, error) {
-	log := logrus.WithFields(logrus.Fields{
+	log := logger.WithFields(logrus.Fields{
 		"context": "Followers",
 		"id":      id,
 		"page":    p,
@@ -111,7 +111,7 @@ func (f00 *Five00px) ListFollowers(id int, p *Page) (*Followers, error) {
 // SearchUser call returns list of users (up to one hundred) users from search
 // results for a specified search term
 func (f00 *Five00px) SearchUser(term string, p *Page) (*Search, error) {
-	log := logrus.WithFields(logrus.Fields{
+	log := logger.WithFields(logrus.Fields{
 		"context": "Search",
 		"term":    term,
 		"page":    p,
@@ -135,7 +135,7 @@ func (f00 *Five00px) SearchUser(term string, p *Page) (*Search, error) {
 // AddFriend call adds new friend by user ID. Returns errors: ErrUserNotFound
 // and ErrUserAlreadyFriend
 func (f00 *Five00px) AddFriend(id int) (*User, error) {
-	log := logrus.WithFields(logrus.Fields{
+	log := logger.WithFields(logrus.Fields{
 		"context": "DelFriend",
 		"id":      id,
 	})
@@ -158,7 +158,7 @@ func (f00 *Five00px) AddFriend(id int) (*User, error) {
 // DelFriend call deletes friend by user ID. Returns errors: ErrUserNotFound
 // and ErrUserNotFriend
 func (f00 *Five00px) DelFriend(id int) (*User, error) {
-	log := logrus.WithFields(logrus.Fields{
+	log := logger.WithFields(logrus.Fields{
 		"context": "DelFriend",
 		"id":      id,
 	})

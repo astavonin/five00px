@@ -30,7 +30,7 @@ type authResp struct {
 
 func (oa *oAuth) Auth() (*AccessToken, error) {
 
-	log := logrus.WithFields(logrus.Fields{
+	log := logger.WithFields(logrus.Fields{
 		"context": "Auth",
 	})
 	reqToken, u, err := oa.c.GetRequestTokenAndUrl(fmt.Sprint("http://127.0.0.1:", oa.Port))

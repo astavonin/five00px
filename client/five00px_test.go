@@ -12,6 +12,8 @@ import (
 	"path"
 	"strings"
 	"testing"
+
+	"github.com/Sirupsen/logrus"
 )
 
 // TestHandlerFunc returns file name  with responce content
@@ -60,6 +62,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func NewTest500px() Five00px {
 	c := http.Client{}
+	logger = logrus.New()
 	return Five00px{c: &c}
 }
 

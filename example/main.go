@@ -28,19 +28,8 @@ type Config struct {
 	Token          *five00px.AccessToken
 }
 
-func main() {
-
-	var configPath = flag.String(
-		"config",
-		"",
-		"PatD9D4B9h to configuration file")
-	flag.Parse()
-	if len(*configPath) == 0 {
-		usage()
-		os.Exit(1)
-	}
-
-	b, err := ioutil.ReadFile(*configPath)
+func loadConfig(path string) *Config {
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,56 +39,75 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return &c
+}
 
-	f00 := five00px.New(c.ConsumerKey, c.ConsumerSecret)
+func storeConfig(path string, c *Config) {
+	b, err := json.MarshalIndent(c, "", "\t")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = ioutil.WriteFile(path, b, 0666)
+	if err != nil {
+		log.Panicln(err)
+	}
+}
 
-	if c.Token.Token == "" || c.Token.Secret == "" {
+func main() {
+
+	var configPath = flag.String(
+		"config",
+		"",
+		"Path to configuration file")
+	flag.Parse()
+	if len(*configPath) == 0 {
+		usage()
+		os.Exit(1)
+	}
+
+	c := loadConfig(*configPath)
+
+	f00 := five00px.New(c.ConsumerKey, c.ConsumerSecret, nil)
+
+	if c.Token == nil {
 		t, err := f00.Auth()
 		if err != nil {
 			log.Fatal(err)
 		}
 		c.Token = t
+		storeConfig(*configPath, c)
 	} else {
 		f00.Restore(c.Token)
 	}
 
-	b, err = json.MarshalIndent(c, "", "\t")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	err = ioutil.WriteFile(*configPath, b, 0644)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	f, err := os.Open("../client/test_data/test_img.jpg")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	var upInfo = five00px.UploadInfo{
-		Category:    five00px.CategoryBW,
-		Description: "test description",
-		Name:        "test name",
-		PhotoStream: f,
-	}
-	photo, err := f00.AddPhoto(upInfo)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(photo)
-
-	//fr, err := f00.Friends(9091479, &five00px.Page{1, 1})
-
-	//for _, u := range fr.Users {
-	//fmt.Println(u.Avatars.Default)
-	//}
-	//u, err := f00.UserByID(9091479)
+	//f, err := os.Open("../client/test_data/test_img.jpg")
 	//if err != nil {
 	//log.Fatal(err)
 	//}
-	//fmt.Println(u.City)
+	//defer f.Close()
+
+	//var upInfo = five00px.UploadInfo{
+	//Category:    five00px.CategoryBW,
+	//Description: "test description",
+	//Name:        "test name",
+	//PhotoStream: f,
+	//}
+	//photo, err := f00.AddPhoto(upInfo)
+	//if err != nil {
+	//log.Fatal(err)
+	//}
+	//fmt.Println(photo)
+
+	fr, err := f00.ListFriends(9091479, &five00px.Page{1, 1})
+
+	for _, u := range fr.Users {
+		fmt.Println(u.Avatars.Default)
+	}
+	u, err := f00.GetUserByID(9091479)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(u.City)
 
 	//fl, err := f00.Followers(9091479, nil)
 	//if err != nil {

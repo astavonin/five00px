@@ -51,7 +51,7 @@ func buildQuery(v url.Values) string {
 func doUpload(c *http.Client, dstPoint, fName string, f io.Reader, vals url.Values) ([]byte, error) {
 
 	dstPoint += buildQuery(vals)
-	log := logrus.WithFields(logrus.Fields{
+	log := logger.WithFields(logrus.Fields{
 		"context": "doUpload",
 		"path":    dstPoint,
 	})
@@ -77,7 +77,7 @@ func doUpload(c *http.Client, dstPoint, fName string, f io.Reader, vals url.Valu
 func doCommand(c *http.Client, dstPoint, method string, vals url.Values) ([]byte, error) {
 	dstPoint += buildQuery(vals)
 
-	log := logrus.WithFields(logrus.Fields{
+	log := logger.WithFields(logrus.Fields{
 		"context": "HTTP " + method,
 		"path":    dstPoint,
 		"values":  vals,

@@ -1,7 +1,11 @@
 // Package five00px provides main 500px API implementation
 package five00px
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/Sirupsen/logrus"
+)
 
 // Five00px client
 type Five00px struct {
@@ -9,9 +13,17 @@ type Five00px struct {
 	oa oAuth
 }
 
+var logger *logrus.Logger = nil
+
 // New call creates and initiate Five00px object. ConsumerKey and
 // ConsumerSecret have to be provided by user
-func New(key, secret string) Five00px {
+func New(key, secret string, log *logrus.Logger) Five00px {
+	if log == nil {
+		logger = logrus.New()
+		logger.Level = logrus.ErrorLevel
+	} else {
+		logger = log
+	}
 	return Five00px{
 		oa: newOAuth(key, secret),
 	}
